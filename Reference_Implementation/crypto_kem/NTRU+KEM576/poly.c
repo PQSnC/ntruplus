@@ -64,14 +64,14 @@ void poly_tobytes(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a)
 	#pragma GCC unroll 2
 	for(size_t i = 0; i < NTRUPLUS_N/2; i++)
 	{
-	t[0] = a->coeffs[2*i];
-	t[0] += (t[0] >> 15) & NTRUPLUS_Q;
-	t[1] = a->coeffs[2*i+1];
-	t[1] += (t[1] >> 15) & NTRUPLUS_Q;
+		t[0] = a->coeffs[2*i];
+		t[0] += (t[0] >> 15) & NTRUPLUS_Q;
+		t[1] = a->coeffs[2*i+1];
+		t[1] += (t[1] >> 15) & NTRUPLUS_Q;
 
-	r[3*i+0] = (t[0] >> 0);
-	r[3*i+1] = (t[0] >> 8) | (t[1] << 4);
-	r[3*i+2] = (t[1] >> 4);
+		r[3*i+0] = (t[0] >> 0);
+		r[3*i+1] = (t[0] >> 8) | (t[1] << 4);
+		r[3*i+2] = (t[1] >> 4);
 	}
 }
 

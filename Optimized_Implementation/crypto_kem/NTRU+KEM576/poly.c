@@ -63,14 +63,14 @@ void poly_tobytes(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a)
 	#pragma GCC unroll 2
 	for(size_t i = 0; i < NTRUPLUS_N/2; i++)
 	{
-	t[0] = a->coeffs[2*i];
-	t[0] += (t[0] >> 15) & NTRUPLUS_Q;
-	t[1] = a->coeffs[2*i+1];
-	t[1] += (t[1] >> 15) & NTRUPLUS_Q;
+		t[0] = a->coeffs[2*i];
+		t[0] += (t[0] >> 15) & NTRUPLUS_Q;
+		t[1] = a->coeffs[2*i+1];
+		t[1] += (t[1] >> 15) & NTRUPLUS_Q;
 
-	r[3*i+0] = (t[0] >> 0);
-	r[3*i+1] = (t[0] >> 8) | (t[1] << 4);
-	r[3*i+2] = (t[1] >> 4);
+		r[3*i+0] = (t[0] >> 0);
+		r[3*i+1] = (t[0] >> 8) | (t[1] << 4);
+		r[3*i+2] = (t[1] >> 4);
 	}
 }
 
@@ -91,7 +91,7 @@ void poly_frombytes(poly *r, const uint8_t a[NTRUPLUS_POLYBYTES])
 		r->coeffs[2*i]   = ((a[3*i+0] >> 0) | ((uint16_t)a[3*i+1] << 8)) & 0xFFF;
 		r->coeffs[2*i+1] = ((a[3*i+1] >> 4) | ((uint16_t)a[3*i+2] << 4)) & 0xFFF;
 	}
-}}
+}
 
 /*************************************************
 * Name:        poly_cbd1
