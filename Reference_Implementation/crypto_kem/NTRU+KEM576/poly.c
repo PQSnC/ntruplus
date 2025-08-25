@@ -59,28 +59,19 @@ static int16_t crepmod3(int16_t a)
 **************************************************/
 void poly_tobytes(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a)
 {
-	int16_t t[4];
+	int16_t t[2];
 
-	for (int i = 0; i < 16; i++)
+	#pragma GCC unroll 2
+	for(size_t i = 0; i < NTRUPLUS_N/2; i++)
 	{
-		for (int j = 0; j < 9; j++)
-		{
-			t[0]  = a->coeffs[64*j + i];
-			t[0] += (t[0] >> 15) & NTRUPLUS_Q;
-			t[1]  = a->coeffs[64*j + i + 16];
-			t[1] += (t[1] >> 15) & NTRUPLUS_Q;
-			t[2]  = a->coeffs[64*j + i + 32];
-			t[2] += (t[2] >> 15) & NTRUPLUS_Q;			
-			t[3]  = a->coeffs[64*j + i + 48];
-			t[3] += (t[3] >> 15) & NTRUPLUS_Q;			
+	t[0] = a->coeffs[2*i];
+	t[0] += (t[0] >> 15) & NTRUPLUS_Q;
+	t[1] = a->coeffs[2*i+1];
+	t[1] += (t[1] >> 15) & NTRUPLUS_Q;
 
-			r[96*j + 2*i +  0] = t[0];
-			r[96*j + 2*i +  1] = (t[0] >> 8) | (t[1] << 4);			
-			r[96*j + 2*i + 32] = (t[1] >> 4);
-			r[96*j + 2*i + 33] = t[2];
-			r[96*j + 2*i + 64] = (t[2] >> 8) | (t[3] << 4); 
-			r[96*j + 2*i + 65] = (t[3] >> 4); 
-		}	
+	r[3*i+0] = (t[0] >> 0);
+	r[3*i+1] = (t[0] >> 8) | (t[1] << 4);
+	r[3*i+2] = (t[1] >> 4);
 	}
 }
 
@@ -96,24 +87,10 @@ void poly_tobytes(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a)
 **************************************************/
 void poly_frombytes(poly *r, const uint8_t a[NTRUPLUS_POLYBYTES])
 {
-	unsigned char t[6];
-
-	for(int i = 0; i < 16; i++)
+	for(size_t i = 0; i < NTRUPLUS_N/2; i++)
 	{
-		for(int j = 0; j < 9; j++)
-		{
-			t[0] = a[96*j + 2*i];
-			t[1] = a[96*j + 2*i + 1];
-			t[2] = a[96*j + 2*i + 32];
-			t[3] = a[96*j + 2*i + 33];
-			t[4] = a[96*j + 2*i + 64];
-			t[5] = a[96*j + 2*i + 65];								
-
-			r->coeffs[64*j + i +  0] = t[0]      | ((int16_t)t[1] & 0xf) << 8;
-			r->coeffs[64*j + i + 16] = t[1] >> 4 | ((int16_t)t[2]      ) << 4;
-			r->coeffs[64*j + i + 32] = t[3]      | ((int16_t)t[4] & 0xf) << 8;
-			r->coeffs[64*j + i + 48] = t[4] >> 4 | ((int16_t)t[5]      ) << 4;
-		}
+		r->coeffs[2*i]   = ((a[3*i+0] >> 0) | ((uint16_t)a[3*i+1] << 8)) & 0xFFF;
+		r->coeffs[2*i+1] = ((a[3*i+1] >> 4) | ((uint16_t)a[3*i+2] << 4)) & 0xFFF;
 	}
 }
 
@@ -131,7 +108,7 @@ void poly_cbd1(poly *r, const uint8_t buf[NTRUPLUS_N/4])
 {
 	uint16_t t1, t2;
 
-	for(int i = 0; i < 2; i++)
+	for(size_t i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 16; j++)
 		{
@@ -177,12 +154,12 @@ void poly_sotp(poly *r, const uint8_t *msg, const uint8_t *buf)
 {
     uint8_t tmp[NTRUPLUS_N/4];
 
-    for(int i = 0; i < NTRUPLUS_N/8; i++)
+    for(size_t i = 0; i < NTRUPLUS_N/8; i++)
     {
          tmp[i] = buf[i]^msg[i];
     }
 
-    for(int i = NTRUPLUS_N/8; i < NTRUPLUS_N/4; i++)
+    for(size_t i = NTRUPLUS_N/8; i < NTRUPLUS_N/4; i++)
     {
          tmp[i] = buf[i];
     }
@@ -206,7 +183,7 @@ int poly_sotp_inv(uint8_t *msg, const poly *a, const uint8_t *buf)
 	uint32_t t1, t2, t3, t4;
 	uint32_t r = 0;
 
-	for(int i = 0; i < 2; i++)
+	for(size_t i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 16; j++)
 		{
@@ -299,7 +276,7 @@ int poly_baseinv(poly *r, const poly *a)
 {
 	int result = 0;
 
-	for(int i = 0; i < NTRUPLUS_N/8; ++i)
+	for(size_t i = 0; i < NTRUPLUS_N/8; ++i)
 	{
 		result = baseinv(r->coeffs + 8*i, a->coeffs + 8*i, zetas[72 + i]);
 		if(result) return 1;
@@ -321,7 +298,7 @@ int poly_baseinv(poly *r, const poly *a)
 **************************************************/
 void poly_basemul(poly *r, const poly *a, const poly *b)
 {
-	for(int i = 0; i < NTRUPLUS_N/8; ++i)
+	for(size_t i = 0; i < NTRUPLUS_N/8; ++i)
 	{
 		basemul(r->coeffs + 8*i, a->coeffs + 8*i, b->coeffs + 8*i, zetas[72 + i]);
 		basemul(r->coeffs + 8*i + 4, a->coeffs + 8*i + 4, b->coeffs + 8*i + 4, -zetas[72 + i]);
@@ -340,7 +317,7 @@ void poly_basemul(poly *r, const poly *a, const poly *b)
 **************************************************/
 void poly_basemul_add(poly *r, const poly *a, const poly *b, const poly *c)
 {
-	for(int i = 0; i < NTRUPLUS_N/8; ++i)
+	for(size_t i = 0; i < NTRUPLUS_N/8; ++i)
 	{
 		basemul_add(r->coeffs + 8*i, a->coeffs + 8*i, b->coeffs + 8*i, c->coeffs + 8*i, zetas[72 + i]);
 		basemul_add(r->coeffs + 8*i + 4, a->coeffs + 8*i + 4, b->coeffs + 8*i + 4, c->coeffs + 8*i + 4, -zetas[72 + i]);
@@ -358,7 +335,7 @@ void poly_basemul_add(poly *r, const poly *a, const poly *b, const poly *c)
 **************************************************/
 void poly_sub(poly *r, const poly *a, const poly *b)
 {
-	for(int i = 0; i < NTRUPLUS_N; ++i)
+	for(size_t i = 0; i < NTRUPLUS_N; ++i)
 		r->coeffs[i] = a->coeffs[i] - b->coeffs[i];
 }
 
@@ -372,7 +349,7 @@ void poly_sub(poly *r, const poly *a, const poly *b)
 **************************************************/
 void poly_triple(poly *r, const poly *a) 
 {
-	for(int i = 0; i < NTRUPLUS_N; ++i)
+	for(size_t i = 0; i < NTRUPLUS_N; ++i)
 		r->coeffs[i] = 3*a->coeffs[i];
 }
 
@@ -386,6 +363,6 @@ void poly_triple(poly *r, const poly *a)
 **************************************************/
 void poly_crepmod3(poly *r, const poly *a)
 {
-  for(int i = 0; i < NTRUPLUS_N; i++)
+  for(size_t i = 0; i < NTRUPLUS_N; i++)
     r->coeffs[i] = crepmod3(a->coeffs[i]);
 }

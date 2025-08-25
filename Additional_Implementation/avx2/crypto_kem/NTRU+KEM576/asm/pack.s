@@ -52,36 +52,6 @@ vpaddw %ymm5, %ymm1, %ymm1
 vpaddw %ymm6, %ymm2, %ymm2
 vpaddw %ymm7, %ymm3, %ymm3
 
-vpslld $16, %ymm1, %ymm10
-vpslld $16, %ymm3, %ymm11
-vpsrld $16, %ymm0, %ymm12
-vpsrld $16, %ymm2, %ymm13
-
-vpblendw $0xAA, %ymm10, %ymm0,  %ymm4
-vpblendw $0xAA, %ymm11, %ymm2,  %ymm5
-vpblendw $0xAA, %ymm1,  %ymm12, %ymm6
-vpblendw $0xAA, %ymm3,  %ymm13, %ymm7
-
-vpsllq $32, %ymm5, %ymm10
-vpsllq $32, %ymm7, %ymm11
-vpsrlq $32, %ymm4, %ymm12
-vpsrlq $32, %ymm6, %ymm13
-
-vpblendd $0xAA, %ymm10, %ymm4,  %ymm0
-vpblendd $0xAA, %ymm11, %ymm6,  %ymm1
-vpblendd $0xAA, %ymm5,  %ymm12, %ymm2
-vpblendd $0xAA, %ymm7,  %ymm13, %ymm3
-
-vpunpcklqdq %ymm1, %ymm0, %ymm4
-vpunpcklqdq %ymm3, %ymm2, %ymm5
-vpunpckhqdq %ymm1, %ymm0, %ymm6
-vpunpckhqdq %ymm3, %ymm2, %ymm7
-
-vperm2i128 $0x20, %ymm5, %ymm4, %ymm0
-vperm2i128 $0x20, %ymm7, %ymm6, %ymm1
-vperm2i128 $0x31, %ymm5, %ymm4, %ymm2
-vperm2i128 $0x31, %ymm7, %ymm6, %ymm3
-
 vpsllw $12,    %ymm1,  %ymm13
 vpxor  %ymm13, %ymm0,  %ymm0
 vpsllw $8,     %ymm2,  %ymm13
@@ -90,6 +60,26 @@ vpxor  %ymm13, %ymm12, %ymm1
 vpsllw $4,     %ymm3,  %ymm13
 vpsrlw $8,     %ymm2,  %ymm12
 vpxor  %ymm13, %ymm12, %ymm2
+
+vpslld      $16, %ymm1, %ymm12
+vpsrld      $16, %ymm1, %ymm13
+vpblendw    $0xAA, %ymm12, %ymm0, %ymm3
+vpblendw    $0xAA, %ymm0, %ymm2, %ymm4
+vpblendw    $0xAA, %ymm2, %ymm13, %ymm5
+
+vpsllq      $32, %ymm4, %ymm12
+vpsrlq      $32, %ymm4, %ymm13
+vpblendd    $0xAA, %ymm12, %ymm3, %ymm0
+vpblendd    $0xAA, %ymm3, %ymm5, %ymm1
+vpblendd    $0xAA, %ymm5, %ymm13, %ymm2
+
+vpunpcklqdq %ymm1, %ymm0, %ymm3
+vpblendd    $0xCC, %ymm0, %ymm2, %ymm4
+vpunpckhqdq %ymm2, %ymm1, %ymm5
+
+vperm2i128  $0x20, %ymm4, %ymm3, %ymm0
+vperm2i128  $0x30, %ymm3, %ymm5, %ymm1
+vperm2i128  $0x31, %ymm5, %ymm4, %ymm2
 
 vmovdqu %ymm0,   (%rdi)
 vmovdqu %ymm1, 32(%rdi)
@@ -114,6 +104,27 @@ vmovdqu   (%rsi), %ymm4
 vmovdqu 32(%rsi), %ymm5
 vmovdqu 64(%rsi), %ymm6
 
+vperm2i128  $0x30, %ymm5, %ymm4, %ymm0
+vperm2i128  $0x03, %ymm4, %ymm6, %ymm1
+vperm2i128  $0x30, %ymm6, %ymm5, %ymm2
+
+vpshufd     $0x4E, %ymm0, %ymm13
+vpblendd    $0xCC, %ymm1, %ymm0, %ymm4
+vpunpcklqdq %ymm2, %ymm13, %ymm5
+vpblendd    $0xCC, %ymm2, %ymm1, %ymm6
+
+vpsrlq      $32, %ymm4, %ymm12
+vpsllq      $32, %ymm6, %ymm13
+vpblendd    $0xAA, %ymm5, %ymm4, %ymm0
+vpblendd    $0xAA, %ymm13, %ymm12, %ymm1
+vpblendd    $0xAA, %ymm6, %ymm5, %ymm2
+
+vpsrld      $16, %ymm0, %ymm12
+vpslld      $16, %ymm2, %ymm13
+vpblendw    $0xAA, %ymm1, %ymm0, %ymm4
+vpblendw    $0xAA, %ymm13, %ymm12, %ymm5
+vpblendw    $0xAA, %ymm2, %ymm1, %ymm6
+
 vpand  %ymm15, %ymm4, %ymm0
 vpsrlw $12,    %ymm4, %ymm4
 vpsllw $4,     %ymm5, %ymm14
@@ -125,36 +136,6 @@ vpxor  %ymm14, %ymm4, %ymm4
 vpand  %ymm15, %ymm4, %ymm2
 vpsrlw $4,     %ymm6, %ymm4
 vpand  %ymm15, %ymm4, %ymm3
-
-vperm2i128 $0x20, %ymm2, %ymm0, %ymm4
-vperm2i128 $0x31, %ymm2, %ymm0, %ymm5
-vperm2i128 $0x20, %ymm3, %ymm1, %ymm6
-vperm2i128 $0x31, %ymm3, %ymm1, %ymm7
-
-vpunpcklqdq %ymm6, %ymm4, %ymm0
-vpunpckhqdq %ymm6, %ymm4, %ymm1
-vpunpcklqdq %ymm7, %ymm5, %ymm2
-vpunpckhqdq %ymm7, %ymm5, %ymm3
-
-vpsllq $32, %ymm2, %ymm11
-vpsrlq $32, %ymm0, %ymm12
-vpsllq $32, %ymm3, %ymm13
-vpsrlq $32, %ymm1, %ymm14
-
-vpblendd $0xAA, %ymm11, %ymm0,  %ymm4
-vpblendd $0xAA, %ymm2,  %ymm12, %ymm5
-vpblendd $0xAA, %ymm13, %ymm1,  %ymm6
-vpblendd $0xAA, %ymm3,  %ymm14, %ymm7
-
-vpsllq $16, %ymm6, %ymm11
-vpsrlq $16, %ymm4, %ymm12
-vpsllq $16, %ymm7, %ymm13
-vpsrlq $16, %ymm5, %ymm14
-
-vpblendw $0xAA, %ymm11, %ymm4,  %ymm0
-vpblendw $0xAA, %ymm6,  %ymm12, %ymm1
-vpblendw $0xAA, %ymm13, %ymm5,  %ymm2
-vpblendw $0xAA, %ymm7,  %ymm14, %ymm3
 
 vmovdqa %ymm0,   (%rdi)
 vmovdqa %ymm1, 32(%rdi)
