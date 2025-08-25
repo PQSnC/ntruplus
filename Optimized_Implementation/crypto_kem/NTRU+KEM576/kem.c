@@ -75,11 +75,14 @@ int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 	
 	//sk
 	poly_tobytes(sk, &f);
-	poly_tobytes(sk + NTRUPLUS_POLYBYTES, &hinv);	
-	hash_f(sk + 2 * NTRUPLUS_POLYBYTES, pk); 
+	poly_tobytes(sk + NTRUPLUS_POLYBYTES, &hinv);
+
+	for(size_t i = 0; i < NTRUPLUS_SYMBYTES + 1; i++)
+		sk[i + 2 * NTRUPLUS_POLYBYTES] = pk[i];
 	
 	return 0;
 }
+
 
 /*************************************************
 * Name:        crypto_kem_enc
@@ -100,14 +103,17 @@ int crypto_kem_enc(unsigned char *ct,
                    unsigned char *ss,
                    const unsigned char *pk)
 {
-    uint8_t msg[NTRUPLUS_N / 8 + NTRUPLUS_SYMBYTES] = {0};
+    uint8_t msg[NTRUPLUS_N / 8 + NTRUPLUS_SYMBYTES + 1] = {0};
     uint8_t buf1[NTRUPLUS_SYMBYTES + NTRUPLUS_N / 4] = {0};
     uint8_t buf2[NTRUPLUS_POLYBYTES] = {0};
 	
 	poly c, h, r, m;
 	
 	randombytes(msg, NTRUPLUS_N / 8);
-	hash_f(msg + NTRUPLUS_N / 8, pk);
+
+	for(size_t i = 0; i < NTRUPLUS_SYMBYTES + 1; i++)
+		msg[i + NTRUPLUS_N / 8] = pk[i];
+
 	hash_h_kem(buf1, msg);
 	
 	poly_cbd1(&r, buf1 + NTRUPLUS_SYMBYTES);
@@ -115,6 +121,7 @@ int crypto_kem_enc(unsigned char *ct,
 	
 	poly_tobytes(buf2, &r);
 	hash_g(buf2, buf2);
+	
 	poly_sotp(&m, msg, buf2);  
 	poly_ntt(&m, &m);
 	
@@ -151,7 +158,7 @@ int crypto_kem_dec(unsigned char *ss,
                    const unsigned char *ct,
                    const unsigned char *sk)
 {
-    uint8_t msg[NTRUPLUS_N/8 + NTRUPLUS_SYMBYTES] = {0};
+    uint8_t msg[NTRUPLUS_N/8 + NTRUPLUS_SYMBYTES + 1] = {0};
     uint8_t buf1[NTRUPLUS_POLYBYTES] = {0};
     uint8_t buf2[NTRUPLUS_POLYBYTES] = {0};
     uint8_t buf3[NTRUPLUS_POLYBYTES + NTRUPLUS_SYMBYTES]= {0};
@@ -178,7 +185,7 @@ int crypto_kem_dec(unsigned char *ss,
 	hash_g(buf2, buf1);
 	fail = poly_sotp_inv(msg, &m1, buf2);
 	
-	for (int i = 0; i < NTRUPLUS_SYMBYTES; i++)
+	for (int i = 0; i < NTRUPLUS_SYMBYTES + 1; i++)
 	{
 		msg[i + NTRUPLUS_N / 8] = sk[i + 2 * NTRUPLUS_POLYBYTES]; 
 	}

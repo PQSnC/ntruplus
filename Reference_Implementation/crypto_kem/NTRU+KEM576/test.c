@@ -260,17 +260,6 @@ static void TEST_MODULE_CLOCK(void)
 	for (int i = 0; i < TEST_LOOP; i++)
 	{
 		cycles1 = cpucycles();
-		hash_f(buf, buf);
-		cycles2 = cpucycles();
-		kcycles += cycles2-cycles1-cyclegap;
-	}
-	printf("  hash_f runs in ................. %8lld cycles", kcycles/TEST_LOOP);
-	printf("\n");
-
-	kcycles=0;
-	for (int i = 0; i < TEST_LOOP; i++)
-	{
-		cycles1 = cpucycles();
 		hash_g(buf, buf);
 		cycles2 = cpucycles();
 		kcycles += cycles2-cycles1-cyclegap;
@@ -302,28 +291,6 @@ static void TEST_MODULE_CLOCK(void)
 	printf("==================================================\n\n");
 }
 
-void TEST()
-{
-	poly a;
-	unsigned char buf[10000] = {0};
-
-	for (size_t i = 0; i < NTRUPLUS_N; i++)
-	{
-		a.coeffs[i] = i;
-	}
-
-	poly_ntt(&a, &a);
-	poly_tobytes(buf, &a);
-
-	for (size_t i = 0; i < NTRUPLUS_POLYBYTES; i++)
-	{
-		printf("%02X", buf[i]);
-		if (i%32 == 31)
-		{
-			printf("\n");
-		}
-	}	
-}
 int main(void)
 {
 	printf("================= BENCHMARK INFO =================\n");
@@ -337,12 +304,10 @@ int main(void)
 	printf("SECRETKEYBYTES : %d\n", CRYPTO_SECRETKEYBYTES);
 	printf("CIPHERTEXTBYTES : %d\n", CRYPTO_CIPHERTEXTBYTES);
 	printf("==================================================\n\n");
-/*
+
 	TEST_CCA_KEM();
 	TEST_CCA_KEM_CLOCK();
 	TEST_MODULE_CLOCK();
-*/
-	TEST();
 
 	return 0;	
 }

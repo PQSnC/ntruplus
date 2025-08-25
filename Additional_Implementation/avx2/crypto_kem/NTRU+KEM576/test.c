@@ -260,17 +260,6 @@ static void TEST_MODULE_CLOCK(void)
 	for (int i = 0; i < TEST_LOOP; i++)
 	{
 		cycles1 = cpucycles();
-		hash_f(buf, buf);
-		cycles2 = cpucycles();
-		kcycles += cycles2-cycles1-cyclegap;
-	}
-	printf("  hash_f runs in ................. %8lld cycles", kcycles/TEST_LOOP);
-	printf("\n");
-
-	kcycles=0;
-	for (int i = 0; i < TEST_LOOP; i++)
-	{
-		cycles1 = cpucycles();
 		hash_g(buf, buf);
 		cycles2 = cpucycles();
 		kcycles += cycles2-cycles1-cyclegap;
