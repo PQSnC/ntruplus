@@ -114,6 +114,7 @@ int crypto_kem_enc(unsigned char *ct,
 	
 	poly_tobytes(buf2, &r);
 	hash_g(buf2, buf2);
+	
 	poly_sotp(&m, msg, buf2);  
 	poly_ntt(&m, &m);
 	
