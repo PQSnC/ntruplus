@@ -6,24 +6,6 @@
 #include "symmetric.h"
 
 /*************************************************
-* Name:        load16_littleendian
-*
-* Description: load 2 bytes into a 16-bit integer
-*              in little-endian order
-*
-* Arguments:   - const uint8_t *x: pointer to input byte array
-*
-* Returns 16-bit unsigned integer loaded from x
-**************************************************/
-static uint16_t load16_littleendian(const uint8_t x[2])
-{
-	uint16_t r;
-	r  = (uint32_t)x[0];
-	r |= (uint32_t)x[1] << 8;;
-	return r;
-}
-
-/*************************************************
 * Name:        crepmod3
 *
 * Description: Compute modulus 3 operation
@@ -107,33 +89,16 @@ void poly_frombytes(poly *r, const uint8_t a[NTRUPLUS_POLYBYTES])
 **************************************************/
 void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 {
-	uint16_t t1, t2;
+	uint8_t t1, t2;
 
-	for(int i = 0; i < 4; i++)
+	for(size_t i = 0; i < NTRUPLUS_N / 8; i++)
 	{
-		for (int j = 0; j < 16; j++)
+		t1 = buf[i];
+		t2 = buf[i + NTRUPLUS_N / 8];
+
+		for(size_t j = 0; j < 8; j++)
 		{
-			t1 = load16_littleendian(buf + 32*i + 2*j);
-			t2 = load16_littleendian(buf + 32*i + 2*j + 144);
-
-			for(int k = 0; k < 16; k++)
-			{
-				r->coeffs[256*i + 16*k + j] = (t1 & 0x1) - (t2 & 0x1);
-
-				t1 >>= 1;   
-				t2 >>= 1;
-			}
-		}
-	}
-
-	for (int j = 0; j < 8; j++)
-	{
-		t1 = load16_littleendian(buf + 128 + 2*j);
-		t2 = load16_littleendian(buf + 128 + 2*j + 144);
-
-		for(int k = 0; k < 16; k++)
-		{
-			r->coeffs[1024 + 8*k + j] = (t1 & 0x1) - (t2 & 0x1);
+			r->coeffs[8*i + j] = (t1 & 0x1) - (t2 & 0x1);
 
 			t1 >>= 1;   
 			t2 >>= 1;
@@ -181,58 +146,33 @@ void poly_sotp(poly *r, const uint8_t *msg, const uint8_t *buf)
 **************************************************/
 int poly_sotp_inv(unsigned char *msg, const poly *a, const unsigned char *buf)
 {
-	uint16_t t1, t2, t3, t4;
+	uint8_t t1, t2, t3;
+	uint16_t t4;
 	uint32_t r = 0;
 
-	for(int i = 0; i < 4; i++)
+	for(size_t i = 0; i < NTRUPLUS_N / 8; i++)
 	{
-		for (int j = 0; j < 16; j++)
-		{
-			t1 = load16_littleendian(buf + 32*i + 2*j);
-			t2 = load16_littleendian(buf + 32*i + 2*j + 144);
-			t3 = 0;
-
-			for(int k = 0; k < 16; k++)
-			{
-				t4 = t2 & 0x1;
-				t4 += a->coeffs[256*i + 16*k + j];
-				r |= t4;
-				t4 = (t4^t1) & 0x1;
-				t3 ^= t4 << k;
-
-				t1 >>= 1;
-				t2 >>= 1;
-			}
-
-			msg[32*i + 2*j   ] = t3;
-			msg[32*i + 2*j + 1] = t3 >> 8;
-		}
-	}
-
-	for (int j = 0; j < 8; j++)
-	{
-		t1 = load16_littleendian(buf + 128 + 2*j);
-		t2 = load16_littleendian(buf + 128 + 2*j + 144);
+		t1 = buf[i                 ];
+		t2 = buf[i + NTRUPLUS_N / 8];
 		t3 = 0;
 
-		for(int k = 0; k < 16; k++)
+		for(int j = 0; j < 8; j++)
 		{
 			t4 = t2 & 0x1;
-			t4 += a->coeffs[1024 + 8*k + j];
+			t4 += a->coeffs[8*i + j];
 			r |= t4;
-			t4 = (t4^t1) & 0x1;
-			t3 ^= t4 << k;
+			t4 = (t4 ^ t1) & 0x1;
+			t3 ^= (uint8_t)(t4 << j);
 
 			t1 >>= 1;
 			t2 >>= 1;
 		}
 
-		msg[128 + 2*j   ] = t3;
-		msg[128 + 2*j + 1] = t3 >> 8;
+		msg[i] = t3;
 	}
 
 	r = r >> 1;
-	r = (-(uint64_t)r) >> 63;
+	r = (-(uint32_t)r) >> 31;
 
 	return r;
 }

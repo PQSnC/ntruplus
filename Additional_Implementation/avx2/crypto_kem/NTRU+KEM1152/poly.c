@@ -21,7 +21,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 
     uint8_t T1, T2;
 
-    for (size_t i = 0; i < 3; i++) {
+    for (size_t i = 0; i < 4; i++) {
         __m256i f0, f1;
         __m256i t0, t1, t2, t3, t4, t5, t6, t7;
         __m256i s0, s1, s2, s3, s4, s5, s6, s7;
@@ -142,7 +142,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
         _mm256_store_si256((__m256i *)&r->coeffs[256*i + 240], u);
     }
 
-	for(size_t i = 96; i < NTRUPLUS_N / 8; i++)
+	for(size_t i = 128; i < NTRUPLUS_N / 8; i++)
 	{
 		T1 = buf[i];
 		T2 = buf[i + NTRUPLUS_N / 8];
