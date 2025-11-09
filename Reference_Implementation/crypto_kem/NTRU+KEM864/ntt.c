@@ -216,8 +216,8 @@ void invntt(int16_t r[NTRUPLUS_N], const int16_t a[NTRUPLUS_N])
 		t1 = r[i] + r[i + NTRUPLUS_N/2];
 		t2 = fqmul(-1665, r[i] - r[i + NTRUPLUS_N/2]);
 
-		r[i               ] = fqmul(-33, t1 - t2);
-		r[i + NTRUPLUS_N/2] = fqmul(-66, t2);
+		r[i               ] = fqmul(-1693, t1 - t2);
+		r[i + NTRUPLUS_N/2] = fqmul(71, t2);
 	}
 }
 
@@ -248,7 +248,8 @@ int baseinv(int16_t r[3], const int16_t a[3], int16_t zeta)
 	if(det == 0) return 1;
 
 	det   = fqinv(det);
-
+	det = montgomery_reduce(det*(-682)); // R^3
+	
 	r[0]  = fqmul(r[0],det);
 	r[1]  = fqmul(r[1],det);
 	r[2]  = fqmul(r[2],det);
@@ -275,6 +276,10 @@ void basemul(int16_t r[3], const int16_t a[3], const int16_t b[3], int16_t zeta)
 	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
 	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
 	r[2] = montgomery_reduce(a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+
+	r[0] = montgomery_reduce(r[0]*867);
+	r[1] = montgomery_reduce(r[1]*867);
+	r[2] = montgomery_reduce(r[2]*867);	
 }
 
 /*************************************************
@@ -293,7 +298,11 @@ void basemul_add(int16_t r[3], const int16_t a[3], const int16_t b[3], const int
 	r[0] = montgomery_reduce(a[2]*b[1]+a[1]*b[2]);
 	r[1] = montgomery_reduce(a[2]*b[2]);
 
-	r[0] = montgomery_reduce(c[0]*(-147)+r[0]*zeta+a[0]*b[0]);
-	r[1] = montgomery_reduce(c[1]*(-147)+r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
-	r[2] = montgomery_reduce(c[2]*(-147)+a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
+	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
+	r[2] = montgomery_reduce(a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+
+	r[0] = montgomery_reduce(c[0]*(-147) + r[0]*867);
+	r[1] = montgomery_reduce(c[1]*(-147) + r[1]*867);
+	r[2] = montgomery_reduce(c[2]*(-147) + r[2]*867);	
 }

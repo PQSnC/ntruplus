@@ -117,7 +117,7 @@ static inline int16_t plantard_reduce_acc(int32_t a)
 	return a;
 }
 
-static inline int16_t plantard_mul(int32_t a, int32_t b)
+static inline int16_t plantard_mul(uint32_t a, uint32_t b)
 {
 	int32_t t = (int32_t)((uint32_t)a*b) >> 16;
 	t = ((t+8)*NTRUPLUS_Q) >> 16;
@@ -513,20 +513,20 @@ void invntt(int16_t r[NTRUPLUS_N], const int16_t a[NTRUPLUS_N])
 		t1 = v[0] + v[3];
 		t2 = plantard_mul(2030077108, v[0] - v[3]);
 
-		v[0] = plantard_mul(-2103378546, t1 - t2);
-		v[3] = plantard_mul(88210205, t2);
+		v[0] = plantard_mul(4280058529, t1 - t2);
+		v[3] = plantard_mul(4265149762, t2);
 
 		t1 = v[1] + v[4];
 		t2 = plantard_mul(2030077108, v[1] - v[4]);
 
-		v[1] = plantard_mul(-2103378546, t1 - t2);
-		v[4] = plantard_mul(88210205, t2);
+		v[1] = plantard_mul(4280058529, t1 - t2);
+		v[4] = plantard_mul(4265149762, t2);
 
 		t1 = v[2] + v[5];
 		t2 = plantard_mul(2030077108, v[2] - v[5]);
 
-		v[2] = plantard_mul(-2103378546, t1 - t2);
-		v[5] = plantard_mul(88210205, t2);				
+		v[2] = plantard_mul(4280058529, t1 - t2);
+		v[5] = plantard_mul(4265149762, t2);				
 
 		for (int j = 0; j < 6; j++)
 		{
@@ -585,11 +585,11 @@ int baseinv(int16_t r[6], const int16_t a[6], uint32_t zeta)
 
 	t = fqinv(t);
 	s = fqinv(s);
-	t = plantard_reduce(t);
-	s = plantard_reduce(s);
+	t = plantard_mul(t, 3975671203);
+	s = plantard_mul(s, 3975671203);
 	
-	T = -t*QINV_PLANT;
-	S = -s*QINV_PLANT;
+	T = t*QINV_PLANT;
+	S = s*QINV_PLANT;
 
 	r[0] = plantard_reduce_acc(r[0]*T);
 	r[1] = plantard_reduce_acc(r[1]*T);
@@ -620,6 +620,10 @@ void basemul(int16_t r[3], const int16_t a[3], const int16_t b[3], int16_t zeta)
 	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
 	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
 	r[2] = montgomery_reduce(a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+
+	r[0] = montgomery_reduce(r[0]*867);
+	r[1] = montgomery_reduce(r[1]*867);
+	r[2] = montgomery_reduce(r[2]*867);	
 }
 
 /*************************************************
@@ -638,7 +642,11 @@ void basemul_add(int16_t r[3], const int16_t a[3], const int16_t b[3], const int
 	r[0] = montgomery_reduce(a[2]*b[1]+a[1]*b[2]);
 	r[1] = montgomery_reduce(a[2]*b[2]);
 
-	r[0] = montgomery_reduce(c[0]*(-147)+r[0]*zeta+a[0]*b[0]);
-	r[1] = montgomery_reduce(c[1]*(-147)+r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
-	r[2] = montgomery_reduce(c[2]*(-147)+a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
+	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
+	r[2] = montgomery_reduce(a[2]*b[0]+a[1]*b[1]+a[0]*b[2]);
+
+	r[0] = montgomery_reduce(c[0]*(-147) + r[0]*867);
+	r[1] = montgomery_reduce(c[1]*(-147) + r[1]*867);
+	r[2] = montgomery_reduce(c[2]*(-147) + r[2]*867);	
 }

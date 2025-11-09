@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 #include "params.h"
 #include "poly.h"
 #include "ntt.h"
@@ -215,7 +216,12 @@ int poly_baseinv(poly *r, const poly *a)
 {
 	for(int i = 0; i < NTRUPLUS_N/8; i++)
 	{
-		if(baseinv(r->coeffs + 8*i, a->coeffs + 8*i, zetas_plant[72 + i])) return 1;
+		if(baseinv(r->coeffs + 8*i, a->coeffs + 8*i, zetas_plant[72 + i]))
+		{
+			memset(r->coeffs, 0, sizeof(int16_t) * NTRUPLUS_N);
+
+			return 1;
+		}
 	}
 
 	return 0;

@@ -216,8 +216,8 @@ void invntt(int16_t r[NTRUPLUS_N], const int16_t a[NTRUPLUS_N])
 		t1 = r[i] + r[i + NTRUPLUS_N/2];
 		t2 = fqmul(-1665, r[i] - r[i + NTRUPLUS_N/2]);
 
-		r[i               ] = fqmul(-33, t1 - t2);
-		r[i + NTRUPLUS_N/2] = fqmul(-66, t2);	
+		r[i               ] = fqmul(-1693, t1 - t2);
+		r[i + NTRUPLUS_N/2] = fqmul(71, t2);	
 	}
 }
 
@@ -235,22 +235,23 @@ int baseinv(int16_t r[4], const int16_t a[4], int16_t zeta)
 {
 	int16_t t0, t1, t2, t3;
 	
-	t0 = montgomery_reduce(a[2]*a[2] - 2*a[1]*a[3]);
-	t1 = montgomery_reduce(a[3]*a[3]);
+	t0 = montgomery_reduce(a[2]*a[2] - 2*a[1]*a[3]); // R^-1
+	t1 = montgomery_reduce(a[3]*a[3]); 
 	t0 = montgomery_reduce(a[0]*a[0] + t0*zeta);
 	t1 = montgomery_reduce(a[1]*a[1] + t1*zeta - 2*a[0]*a[2]);
-	
 	t2 = montgomery_reduce(t1*zeta);
-	t3 = montgomery_reduce(t0*t0 - t1*t2);
+	
+	t3 = montgomery_reduce(t0*t0 - t1*t2);  // R^-3
 
 	if(t3 == 0) return 1;
 
-	r[0] = montgomery_reduce(a[0]*t0 + a[2]*t2);
-	r[1] = montgomery_reduce(a[3]*t2 + a[1]*t0);
-	r[2] = montgomery_reduce(a[2]*t0 + a[0]*t1);
-	r[3] = montgomery_reduce(a[1]*t1 + a[3]*t0);
+	r[0] = montgomery_reduce(a[0]*t0 + a[2]*t2); // R^-2
+	r[1] = montgomery_reduce(a[3]*t2 + a[1]*t0); // R^-2
+	r[2] = montgomery_reduce(a[2]*t0 + a[0]*t1); // R^-2
+	r[3] = montgomery_reduce(a[1]*t1 + a[3]*t0); // R^-2
 
-	t3 = fqinv(t3);
+	t3 = fqinv(t3); // R^5
+	t3 = montgomery_reduce(t3*(-682)); // R^3
 
 	r[0] =  montgomery_reduce(r[0]*t3);
 	r[1] = -montgomery_reduce(r[1]*t3);
@@ -281,6 +282,11 @@ void basemul(int16_t r[4], const int16_t a[4], const int16_t b[4], int16_t zeta)
 	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
 	r[2] = montgomery_reduce(r[2]*zeta+a[0]*b[2]+a[1]*b[1]+a[2]*b[0]);
 	r[3] = montgomery_reduce(a[0]*b[3]+a[1]*b[2]+a[2]*b[1]+a[3]*b[0]);
+
+	r[0] = montgomery_reduce(r[0]*867);
+	r[1] = montgomery_reduce(r[1]*867);
+	r[2] = montgomery_reduce(r[2]*867);
+	r[3] = montgomery_reduce(r[3]*867);
 }
 
 /*************************************************
@@ -301,8 +307,13 @@ void basemul_add(int16_t r[4], const int16_t a[4], const int16_t b[4], const int
 	r[1] = montgomery_reduce(a[2]*b[3]+a[3]*b[2]);
 	r[2] = montgomery_reduce(a[3]*b[3]);
 
-	r[0] = montgomery_reduce(c[0]*(-147)+r[0]*zeta+a[0]*b[0]);
-	r[1] = montgomery_reduce(c[1]*(-147)+r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
-	r[2] = montgomery_reduce(c[2]*(-147)+r[2]*zeta+a[0]*b[2]+a[1]*b[1]+a[2]*b[0]);
-	r[3] = montgomery_reduce(c[3]*(-147)+a[0]*b[3]+a[1]*b[2]+a[2]*b[1]+a[3]*b[0]);
+	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
+	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
+	r[2] = montgomery_reduce(r[2]*zeta+a[0]*b[2]+a[1]*b[1]+a[2]*b[0]);
+	r[3] = montgomery_reduce(a[0]*b[3]+a[1]*b[2]+a[2]*b[1]+a[3]*b[0]);
+
+	r[0] = montgomery_reduce(c[0]*(-147) + r[0]*867);
+	r[1] = montgomery_reduce(c[1]*(-147) + r[1]*867);
+	r[2] = montgomery_reduce(c[2]*(-147) + r[2]*867);
+	r[3] = montgomery_reduce(c[3]*(-147) + r[3]*867);
 }
