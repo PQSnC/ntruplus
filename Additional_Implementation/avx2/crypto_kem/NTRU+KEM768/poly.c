@@ -26,7 +26,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
         __m256i u;
 
         f0 = _mm256_loadu_si256((const __m256i *)&buf[32*i]);
-        f1 = _mm256_loadu_si256((const __m256i *)&buf[32*i + NTRUPLUS_N/8]);
+        f1 = _mm256_loadu_si256((const __m256i *)&buf[32*i + NTRUPLUS_N / 8]);
 
         t0 = _mm256_and_si256(mask55, f0);
         s0 = _mm256_and_si256(mask55, f1);
@@ -151,7 +151,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 *              - const uint8_t *msg: pointer to input message
 *              - const uint8_t *buf: pointer to input random
 **************************************************/
-void poly_sotp(poly *r, const uint8_t *msg, const uint8_t buf[NTRUPLUS_N/4])
+void poly_sotp(poly *r, const uint8_t msg[NTRUPLUS_N/8], const uint8_t buf[NTRUPLUS_N/4])
 {
     uint8_t tmp[NTRUPLUS_N / 4];
 
@@ -179,7 +179,7 @@ void poly_sotp(poly *r, const uint8_t *msg, const uint8_t buf[NTRUPLUS_N/4])
 *
 * Returns 0 (success) or 1 (failure)
 **************************************************/
-int poly_sotp_inv(uint8_t *msg, const poly *a, const uint8_t buf[NTRUPLUS_N/4])
+int poly_sotp_inv(uint8_t msg[NTRUPLUS_N/8], const poly *a, const uint8_t buf[NTRUPLUS_N/4])
 {
 	uint8_t t1, t2, t3;
 	uint16_t t4;
@@ -187,8 +187,8 @@ int poly_sotp_inv(uint8_t *msg, const poly *a, const uint8_t buf[NTRUPLUS_N/4])
 
 	for(size_t i = 0; i < NTRUPLUS_N / 8; i++)
 	{
-		t1 = buf[i     ];
-		t2 = buf[i + 96];
+		t1 = buf[i                 ];
+		t2 = buf[i + NTRUPLUS_N / 8];
 		t3 = 0;
 
 		for(int j = 0; j < 8; j++)

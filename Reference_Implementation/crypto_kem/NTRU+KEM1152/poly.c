@@ -116,7 +116,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 *              - const uint8_t *msg: pointer to input message
 *              - const uint8_t *buf: pointer to input random
 **************************************************/
-void poly_sotp(poly *r, const uint8_t *msg, const uint8_t *buf)
+void poly_sotp(poly *r, const uint8_t msg[NTRUPLUS_N/8], const uint8_t buf[NTRUPLUS_N/4])
 {
     uint8_t tmp[NTRUPLUS_N/4];
 
@@ -144,7 +144,7 @@ void poly_sotp(poly *r, const uint8_t *msg, const uint8_t *buf)
 *
 * Returns 0 (success) or 1 (failure)
 **************************************************/
-int poly_sotp_inv(unsigned char *msg, const poly *a, const unsigned char *buf)
+int poly_sotp_inv(uint8_t msg[NTRUPLUS_N/8], const poly *a, const uint8_t buf[NTRUPLUS_N/4])
 {
 	uint8_t t1, t2, t3;
 	uint16_t t4;
