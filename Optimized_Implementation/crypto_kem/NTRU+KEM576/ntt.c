@@ -489,21 +489,28 @@ int baseinv(int16_t r[8], const int16_t a[8], uint32_t zeta)
 *              - const int16_t b[4]: pointer to the second factor
 *              - int16_t zeta: integer defining the reduction polynomial
 **************************************************/
-void basemul(int16_t r[4], const int16_t a[4], const int16_t b[4], int16_t zeta)
+void basemul(int16_t r[4], const int16_t a[4], const int16_t b[4], uint32_t zeta)
 {
-	r[0] = montgomery_reduce(a[1]*b[3]+a[2]*b[2]+a[3]*b[1]);
-	r[1] = montgomery_reduce(a[2]*b[3]+a[3]*b[2]);
-	r[2] = montgomery_reduce(a[3]*b[3]);
+	uint32_t A0, A1, A2, A3;
 
-	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
-	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
-	r[2] = montgomery_reduce(r[2]*zeta+a[0]*b[2]+a[1]*b[1]+a[2]*b[0]);
-	r[3] = montgomery_reduce(a[0]*b[3]+a[1]*b[2]+a[2]*b[1]+a[3]*b[0]);
+	A0 = a[0] * QINV_PLANT;
+	A1 = a[1] * QINV_PLANT;
+	A2 = a[2] * QINV_PLANT;
+	A3 = a[3] * QINV_PLANT;
 
-	r[0] = montgomery_reduce(r[0]*867);
-	r[1] = montgomery_reduce(r[1]*867);
-	r[2] = montgomery_reduce(r[2]*867);
-	r[3] = montgomery_reduce(r[3]*867);
+	r[0] = plantard_reduce_acc(A1*b[3]+A2*b[2]+A3*b[1]);
+	r[1] = plantard_reduce_acc(A2*b[3]+A3*b[2]);
+	r[2] = plantard_reduce_acc(A3*b[3]);
+
+	r[0] = plantard_reduce_acc(r[0]*zeta+A0*b[0]);
+	r[1] = plantard_reduce_acc(r[1]*zeta+A0*b[1]+A1*b[0]);
+	r[2] = plantard_reduce_acc(r[2]*zeta+A0*b[2]+A1*b[1]+A2*b[0]);
+	r[3] = plantard_reduce_acc(A0*b[3]+A1*b[2]+A2*b[1]+A3*b[0]);
+
+	r[0] = plantard_mul(r[0], 3217808880);
+	r[1] = plantard_mul(r[1], 3217808880);
+	r[2] = plantard_mul(r[2], 3217808880);
+	r[3] = plantard_mul(r[3], 3217808880);
 }
 
 /*************************************************
@@ -518,19 +525,26 @@ void basemul(int16_t r[4], const int16_t a[4], const int16_t b[4], int16_t zeta)
 *              - const int16_t c[4]: pointer to the third factor
 *              - int16_t zeta: integer defining the reduction polynomial
 **************************************************/
-void basemul_add(int16_t r[4], const int16_t a[4], const int16_t b[4], const int16_t c[4], int16_t zeta)
+void basemul_add(int16_t r[4], const int16_t a[4], const int16_t b[4], const int16_t c[4], uint32_t zeta)
 {
-	r[0] = montgomery_reduce(a[1]*b[3]+a[2]*b[2]+a[3]*b[1]);
-	r[1] = montgomery_reduce(a[2]*b[3]+a[3]*b[2]);
-	r[2] = montgomery_reduce(a[3]*b[3]);
+	uint32_t A0, A1, A2, A3;
 
-	r[0] = montgomery_reduce(r[0]*zeta+a[0]*b[0]);
-	r[1] = montgomery_reduce(r[1]*zeta+a[0]*b[1]+a[1]*b[0]);
-	r[2] = montgomery_reduce(r[2]*zeta+a[0]*b[2]+a[1]*b[1]+a[2]*b[0]);
-	r[3] = montgomery_reduce(a[0]*b[3]+a[1]*b[2]+a[2]*b[1]+a[3]*b[0]);
+	A0 = a[0] * QINV_PLANT;
+	A1 = a[1] * QINV_PLANT;
+	A2 = a[2] * QINV_PLANT;
+	A3 = a[3] * QINV_PLANT;
 
-	r[0] = montgomery_reduce(c[0]*(-147) + r[0]*867);
-	r[1] = montgomery_reduce(c[1]*(-147) + r[1]*867);
-	r[2] = montgomery_reduce(c[2]*(-147) + r[2]*867);
-	r[3] = montgomery_reduce(c[3]*(-147) + r[3]*867);
+	r[0] = plantard_reduce_acc(A1*b[3]+A2*b[2]+A3*b[1]);
+	r[1] = plantard_reduce_acc(A2*b[3]+A3*b[2]);
+	r[2] = plantard_reduce_acc(A3*b[3]);
+
+	r[0] = plantard_reduce_acc(r[0]*zeta+A0*b[0]);
+	r[1] = plantard_reduce_acc(r[1]*zeta+A0*b[1]+A1*b[0]);
+	r[2] = plantard_reduce_acc(r[2]*zeta+A0*b[2]+A1*b[1]+A2*b[0]);
+	r[3] = plantard_reduce_acc(A0*b[3]+A1*b[2]+A2*b[1]+A3*b[0]);
+
+	r[0] = plantard_reduce_acc(c[0]*1242398 + r[0]*3217808880);
+	r[1] = plantard_reduce_acc(c[1]*1242398 + r[1]*3217808880);
+	r[2] = plantard_reduce_acc(c[2]*1242398 + r[2]*3217808880);
+	r[3] = plantard_reduce_acc(c[3]*1242398 + r[3]*3217808880);
 }
