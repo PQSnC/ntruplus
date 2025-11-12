@@ -1,3 +1,6 @@
+#ifndef CONSTS_H
+#define CONSTS_H
+
 #include <stdint.h>
 #include "params.h"
 
@@ -244,3 +247,5 @@ const uint16_t _16xR2modq[16] __attribute__((aligned(32))) = {R2modq, R2modq, R2
 #undef Qm1div2
 #undef Qp1div2
 #undef R2modq
+
+#endif
