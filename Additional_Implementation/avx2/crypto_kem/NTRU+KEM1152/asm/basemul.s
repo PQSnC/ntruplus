@@ -372,7 +372,6 @@ add $64,  %rcx
 cmp %r8,  %rsi
 jb  _looptop_basemul
 
-
 mov %rdi, %r8
 sub $2304, %rdi
 
