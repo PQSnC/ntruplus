@@ -557,10 +557,7 @@ _loop_inner1:
     uzp2 v13.8h, v15.8h, v16.8h //r[2]
     uzp2 v14.8h, v17.8h, v18.8h //r[3]
 
-    str q11, [dst, #0*16]
-    str q12, [dst, #1*16]
-    str q13, [dst, #2*16]
-    str q14, [dst, #3*16]
+    st1 {v11.8h - v14.8h}, [dst], #64
 
     smull  v11.4s,  v7.4h, v28.4h //a0*t0
     smull2 v12.4s,  v7.8h, v28.8h //a0*t0   
@@ -606,15 +603,10 @@ _loop_inner1:
     uzp2 v13.8h, v15.8h, v16.8h //r[2]
     uzp2 v14.8h, v17.8h, v18.8h //r[3]
 
-    str q11, [dst, #4*16]
-    str q12, [dst, #5*16]
-    str q13, [dst, #6*16]
-    str q14, [dst, #7*16]
+    st1 {v11.8h - v14.8h}, [dst], #64
 
-    add dst, dst, #128
     subs counter2, counter2, #128
     b.ne _loop_inner1
-
 
     subs dst, dst, #384
     mov stack_ptr, sp
