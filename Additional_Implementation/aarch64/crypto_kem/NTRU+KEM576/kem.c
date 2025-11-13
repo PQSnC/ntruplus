@@ -38,31 +38,32 @@ static inline int verify(const uint8_t *a, const uint8_t *b, size_t len)
 **************************************************/
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
-	uint8_t buf[NTRUPLUS_N / 4] = {0};
+	int r;
+	uint8_t seed[32];
+	uint8_t buf[NTRUPLUS_N / 2] = {0};
 	
 	poly f, finv;
 	poly g;
 	poly h, hinv;
 
 	do {
-		randombytes(buf, 32);
-		shake256(buf, NTRUPLUS_N / 4, buf, 32);
+		randombytes(seed, 32);
+		shake256(buf, NTRUPLUS_N / 2, seed, 32);
 		
 		poly_cbd1(&f, buf);
+		poly_cbd1(&g, buf + NTRUPLUS_N / 4); 
+
 		poly_triple(&f, &f);
+		poly_triple(&g, &g);
+
 		f.coeffs[0] += 1;
 		poly_ntt(&f, &f);
-	} while(poly_baseinv(&finv, &f));
-
-	do {
-		randombytes(buf, 32);
-		shake256(buf, NTRUPLUS_N / 4, buf, 32);
-
-		poly_cbd1(&g, buf); 
-		poly_triple(&g, &g);
 		poly_ntt(&g, &g);
+
+		r = poly_baseinv(&finv, &f);
 		poly_basemul(&h, &g, &finv);
-	} while(poly_baseinv(&hinv, &h));
+		r |= poly_baseinv(&hinv, &h);
+	} while(r);
 	
 	//pk
 	poly_tobytes(pk, &h);
@@ -115,7 +116,7 @@ int crypto_kem_enc(unsigned char *ct,
 	poly_tobytes(buf2, &r);
 	hash_g(buf2, buf2);
 	
-	poly_sotp(&m, msg, buf2);  
+	poly_sotp(&m, msg, buf2);
 	poly_ntt(&m, &m);
 	
 	poly_frombytes(&h, pk);

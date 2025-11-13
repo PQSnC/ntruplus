@@ -42,9 +42,9 @@ _looptop:
     uzp1    v19.8h, v14.8h, v15.8h
     uzp1    v18.8h, v12.8h, v13.8h
 
-    mul     v20.8h, v20.8h, v0.h[1]
-    mul     v19.8h, v19.8h, v0.h[1]
-    mul     v18.8h, v18.8h, v0.h[1]
+    mul     v20.8h, v20.8h, v0.h[2]
+    mul     v19.8h, v19.8h, v0.h[2]
+    mul     v18.8h, v18.8h, v0.h[2]
 
     smlal   v16.4s, v20.4h, v0.h[0]
     smlal2  v17.4s, v20.8h, v0.h[0]
@@ -92,10 +92,10 @@ _looptop:
     uzp1    v21.8h, v14.8h, v15.8h
     uzp1    v20.8h, v12.8h, v13.8h
 
-    mul     v23.8h, v23.8h, v0.h[1]
-    mul     v22.8h, v22.8h, v0.h[1]
-    mul     v21.8h, v21.8h, v0.h[1]
-    mul     v20.8h, v20.8h, v0.h[1]
+    mul     v23.8h, v23.8h, v0.h[2]
+    mul     v22.8h, v22.8h, v0.h[2]
+    mul     v21.8h, v21.8h, v0.h[2]
+    mul     v20.8h, v20.8h, v0.h[2]
 
     smlal   v18.4s, v23.4h, v0.h[0]
     smlal   v16.4s, v22.4h, v0.h[0]
@@ -112,8 +112,40 @@ _looptop:
     uzp2    v5.8h, v14.8h, v15.8h
     uzp2    v4.8h, v12.8h, v13.8h
 
+    #mul
+    mul v11.8h, v7.8h, v0.h[3]
+    mul v10.8h, v6.8h, v0.h[3]
+    mul  v9.8h, v5.8h, v0.h[3]
+    mul  v8.8h, v4.8h, v0.h[3]
+
+    sqrdmulh v7.8h, v7.8h, v0.h[4]
+    sqrdmulh v6.8h, v6.8h, v0.h[4]
+    sqrdmulh v5.8h, v5.8h, v0.h[4]
+    sqrdmulh v4.8h, v4.8h, v0.h[4]
+
+    mls v11.8h, v7.8h, v0.h[0]
+    mls v10.8h, v6.8h, v0.h[0]
+    mls  v9.8h, v5.8h, v0.h[0]
+    mls  v8.8h, v4.8h, v0.h[0]
+
+    #reduce
+    sqdmulh v15.8h, v11.8h, v0.h[1]
+    sqdmulh v14.8h, v10.8h, v0.h[1]
+    sqdmulh v13.8h,  v9.8h, v0.h[1]
+    sqdmulh v12.8h,  v8.8h, v0.h[1]
+
+    srshr v15.8h, v15.8h, #11
+    srshr v14.8h, v14.8h, #11
+    srshr v13.8h, v13.8h, #11
+    srshr v12.8h, v12.8h, #11
+
+    mls v11.8h, v15.8h, v0.h[0]
+    mls v10.8h, v14.8h, v0.h[0]
+    mls  v9.8h, v13.8h, v0.h[0]
+    mls  v8.8h, v12.8h, v0.h[0]
+
     #store
-    st1 {v4.8h, v5.8h, v6.8h, v7.8h}, [dst], #64
+    st1 {v8.8h - v11.8h}, [dst], #64
     
     subs counter, counter, #64
     b.ne _looptop
@@ -173,9 +205,9 @@ _looptop_add:
     uzp1 v23.8h, v18.8h, v19.8h
     uzp1 v22.8h, v16.8h, v17.8h
 
-    mul v24.8h, v24.8h, v0.h[1]
-    mul v23.8h, v23.8h, v0.h[1]
-    mul v22.8h, v22.8h, v0.h[1]
+    mul v24.8h, v24.8h, v0.h[2]
+    mul v23.8h, v23.8h, v0.h[2]
+    mul v22.8h, v22.8h, v0.h[2]
 
     smlal  v20.4s, v24.4h, v0.h[0]
     smlal2 v21.4s, v24.8h, v0.h[0]
@@ -218,24 +250,15 @@ _looptop_add:
     smlal  v20.4s, v6.4h, v8.4h //a2*b0
     smlal2 v21.4s, v6.8h, v8.8h //a2*b0
 
-    smlal  v16.4s, v12.4h, v0.h[2] //c0*R
-    smlal2 v17.4s, v12.8h, v0.h[2] //c0*R
-    smlal  v18.4s, v13.4h, v0.h[2] //c1*R
-    smlal2 v19.4s, v13.8h, v0.h[2] //c1*R
-    smlal  v20.4s, v14.4h, v0.h[2] //c2*R
-    smlal2 v21.4s, v14.8h, v0.h[2] //c2*R
-    smlal  v22.4s, v15.4h, v0.h[2] //c3*R
-    smlal2 v23.4s, v15.8h, v0.h[2] //c3*R
-
     uzp1 v24.8h, v16.8h, v17.8h
     uzp1 v25.8h, v18.8h, v19.8h
     uzp1 v26.8h, v20.8h, v21.8h
     uzp1 v27.8h, v22.8h, v23.8h
 
-    mul v24.8h, v24.8h, v0.h[1]
-    mul v25.8h, v25.8h, v0.h[1]
-    mul v26.8h, v26.8h, v0.h[1]
-    mul v27.8h, v27.8h, v0.h[1]
+    mul v24.8h, v24.8h, v0.h[2]
+    mul v25.8h, v25.8h, v0.h[2]
+    mul v26.8h, v26.8h, v0.h[2]
+    mul v27.8h, v27.8h, v0.h[2]
 
     smlal  v16.4s, v24.4h, v0.h[0]
     smlal2 v17.4s, v24.8h, v0.h[0]
@@ -251,8 +274,46 @@ _looptop_add:
     uzp2 v6.8h, v20.8h, v21.8h
     uzp2 v7.8h, v22.8h, v23.8h
 
+    #mul
+    mul  v8.8h, v4.8h, v0.h[3]
+    mul  v9.8h, v5.8h, v0.h[3]
+    mul v10.8h, v6.8h, v0.h[3]
+    mul v11.8h, v7.8h, v0.h[3]
+
+    sqrdmulh v4.8h, v4.8h, v0.h[4]
+    sqrdmulh v5.8h, v5.8h, v0.h[4]
+    sqrdmulh v6.8h, v6.8h, v0.h[4]
+    sqrdmulh v7.8h, v7.8h, v0.h[4]
+
+    mls  v8.8h, v4.8h, v0.h[0]
+    mls  v9.8h, v5.8h, v0.h[0]
+    mls v10.8h, v6.8h, v0.h[0]
+    mls v11.8h, v7.8h, v0.h[0]
+
+    #add
+    add  v8.8h,  v8.8h, v12.8h
+    add  v9.8h,  v9.8h, v13.8h
+    add v10.8h, v10.8h, v14.8h
+    add v11.8h, v11.8h, v15.8h
+
+    #reduce
+    sqdmulh v12.8h,  v8.8h, v0.h[1]
+    sqdmulh v13.8h,  v9.8h, v0.h[1]
+    sqdmulh v14.8h, v10.8h, v0.h[1]
+    sqdmulh v15.8h, v11.8h, v0.h[1]
+
+    srshr v12.8h, v12.8h, #11
+    srshr v13.8h, v13.8h, #11
+    srshr v14.8h, v14.8h, #11
+    srshr v15.8h, v15.8h, #11
+
+    mls  v8.8h, v12.8h, v0.h[0]
+    mls  v9.8h, v13.8h, v0.h[0]
+    mls v10.8h, v14.8h, v0.h[0]
+    mls v11.8h, v15.8h, v0.h[0]
+
     #store
-    st1 {v4.8h - v7.8h}, [dst], #64
+    st1 {v8.8h - v11.8h}, [dst], #64
     
     subs counter, counter, #64
     b.ne _looptop_add
@@ -329,10 +390,10 @@ _loop_inner1:
     uzp1 v19.8h, v11.8h, v12.8h
     uzp1 v20.8h, v13.8h, v14.8h
 
-    mul v21.8h, v21.8h, v0.h[1]
-    mul v22.8h, v22.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
+    mul v21.8h, v21.8h, v0.h[2]
+    mul v22.8h, v22.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
 
     smlal  v15.4s, v21.4h, v0.h[0]
     smlal2 v16.4s, v21.8h, v0.h[0]
@@ -378,10 +439,10 @@ _loop_inner1:
     uzp1 v21.8h, v15.8h, v16.8h
     uzp1 v22.8h, v17.8h, v18.8h
 
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
-    mul v21.8h, v21.8h, v0.h[1]
-    mul v22.8h, v22.8h, v0.h[1]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
+    mul v21.8h, v21.8h, v0.h[2]
+    mul v22.8h, v22.8h, v0.h[2]
 
     smlal  v11.4s, v19.4h, v0.h[0]
     smlal2 v12.4s, v19.8h, v0.h[0]
@@ -405,8 +466,8 @@ _loop_inner1:
     uzp1 v19.8h, v11.8h, v12.8h
     uzp1 v20.8h, v13.8h, v14.8h
 
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
 
     smlal  v11.4s, v19.4h, v0.h[0]
     smlal2 v12.4s, v19.8h, v0.h[0]
@@ -432,8 +493,8 @@ _loop_inner1:
     uzp1 v19.8h, v11.8h, v12.8h
     uzp1 v20.8h, v13.8h, v14.8h
 
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
 
     smlal  v11.4s, v19.4h, v0.h[0]
     smlal2 v12.4s, v19.8h, v0.h[0]
@@ -477,10 +538,10 @@ _loop_inner1:
     uzp1 v21.8h, v15.8h, v16.8h
     uzp1 v22.8h, v17.8h, v18.8h
 
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
-    mul v21.8h, v21.8h, v0.h[1]
-    mul v22.8h, v22.8h, v0.h[1]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
+    mul v21.8h, v21.8h, v0.h[2]
+    mul v22.8h, v22.8h, v0.h[2]
 
     smlal  v11.4s, v19.4h, v0.h[0]
     smlal2 v12.4s, v19.8h, v0.h[0]
@@ -526,10 +587,10 @@ _loop_inner1:
     uzp1 v21.8h, v15.8h, v16.8h
     uzp1 v22.8h, v17.8h, v18.8h
 
-    mul v19.8h, v19.8h, v0.h[1]
-    mul v20.8h, v20.8h, v0.h[1]
-    mul v21.8h, v21.8h, v0.h[1]
-    mul v22.8h, v22.8h, v0.h[1]
+    mul v19.8h, v19.8h, v0.h[2]
+    mul v20.8h, v20.8h, v0.h[2]
+    mul v21.8h, v21.8h, v0.h[2]
+    mul v22.8h, v22.8h, v0.h[2]
 
     smlal  v11.4s, v19.4h, v0.h[0]
     smlal2 v12.4s, v19.8h, v0.h[0]
@@ -575,9 +636,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -602,9 +663,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -629,9 +690,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -656,9 +717,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -683,9 +744,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -710,9 +771,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -737,9 +798,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -764,9 +825,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -791,9 +852,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -818,9 +879,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -845,9 +906,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -872,9 +933,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -899,9 +960,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -926,9 +987,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -953,9 +1014,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -980,9 +1041,9 @@ _loop_inner2:
     uzp1 v18.8h, v13.8h, v14.8h
     uzp1 v19.8h, v15.8h, v16.8h
 
-    mul v17.8h, v17.8h, v0.h[1]    
-    mul v18.8h, v18.8h, v0.h[1]
-    mul v19.8h, v19.8h, v0.h[1]
+    mul v17.8h, v17.8h, v0.h[2]    
+    mul v18.8h, v18.8h, v0.h[2]
+    mul v19.8h, v19.8h, v0.h[2]
     
     smlal  v11.4s, v17.4h, v0.h[0]
     smlal2 v12.4s, v17.8h, v0.h[0]
@@ -991,9 +1052,22 @@ _loop_inner2:
     smlal  v15.4s, v19.4h, v0.h[0]
     smlal2 v16.4s, v19.8h, v0.h[0]
 
-    uzp2 v29.8h, v11.8h, v12.8h //det0
-    uzp2 v30.8h, v13.8h, v14.8h //det1
-    uzp2 v31.8h, v15.8h, v16.8h //det2
+    uzp2 v26.8h, v11.8h, v12.8h //det0
+    uzp2 v27.8h, v13.8h, v14.8h //det1
+    uzp2 v28.8h, v15.8h, v16.8h //det2
+
+    #mul
+    mul v29.8h, v26.8h, v0.h[5]
+    mul v30.8h, v27.8h, v0.h[5]
+    mul v31.8h, v28.8h, v0.h[5]
+
+    sqrdmulh v26.8h, v26.8h, v0.h[6]
+    sqrdmulh v27.8h, v27.8h, v0.h[6]
+    sqrdmulh v28.8h, v28.8h, v0.h[6]
+
+    mls v29.8h, v26.8h, v0.h[0]
+    mls v30.8h, v27.8h, v0.h[0]
+    mls v31.8h, v28.8h, v0.h[0]
 
     neg v26.8h, v29.8h //-det0
     neg v27.8h, v30.8h //-det0
@@ -1015,10 +1089,10 @@ _loop_inner2:
     uzp1 v17.8h, v11.8h, v12.8h
     uzp1 v18.8h, v13.8h, v14.8h
 
-    mul v15.8h, v15.8h, v0.h[1]
-    mul v16.8h, v16.8h, v0.h[1]
-    mul v17.8h, v17.8h, v0.h[1]
-    mul v18.8h, v18.8h, v0.h[1]
+    mul v15.8h, v15.8h, v0.h[2]
+    mul v16.8h, v16.8h, v0.h[2]
+    mul v17.8h, v17.8h, v0.h[2]
+    mul v18.8h, v18.8h, v0.h[2]
 
     smlal   v7.4s, v15.4h, v0.h[0]
     smlal2  v8.4s, v15.8h, v0.h[0]
@@ -1052,10 +1126,10 @@ _loop_inner2:
     uzp1 v17.8h, v11.8h, v12.8h
     uzp1 v18.8h, v13.8h, v14.8h
 
-    mul v15.8h, v15.8h, v0.h[1]
-    mul v16.8h, v16.8h, v0.h[1]
-    mul v17.8h, v17.8h, v0.h[1]
-    mul v18.8h, v18.8h, v0.h[1]
+    mul v15.8h, v15.8h, v0.h[2]
+    mul v16.8h, v16.8h, v0.h[2]
+    mul v17.8h, v17.8h, v0.h[2]
+    mul v18.8h, v18.8h, v0.h[2]
 
     smlal   v7.4s, v15.4h, v0.h[0]
     smlal2  v8.4s, v15.8h, v0.h[0]
@@ -1089,10 +1163,10 @@ _loop_inner2:
     uzp1 v17.8h, v11.8h, v12.8h
     uzp1 v18.8h, v13.8h, v14.8h
 
-    mul v15.8h, v15.8h, v0.h[1]
-    mul v16.8h, v16.8h, v0.h[1]
-    mul v17.8h, v17.8h, v0.h[1]
-    mul v18.8h, v18.8h, v0.h[1]
+    mul v15.8h, v15.8h, v0.h[2]
+    mul v16.8h, v16.8h, v0.h[2]
+    mul v17.8h, v17.8h, v0.h[2]
+    mul v18.8h, v18.8h, v0.h[2]
 
     smlal   v7.4s, v15.4h, v0.h[0]
     smlal2  v8.4s, v15.8h, v0.h[0]
@@ -1153,7 +1227,7 @@ _loop_notinvertible:
 
 .align 4
 zetas_mul:
-    .hword 0x0d81, 0xcd7f, 0xff6d, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
+    .hword 0x0d81, 0x4bd4, 0xcd7f, 0xff6d, 0xfa8f, 0xf9dd, 0xc5d5, 0x0000
     .hword 0x00df, 0x0472, 0xfbdd, 0xfe73, 0xff49, 0x0677, 0x022f, 0xf976
     .hword 0xff21, 0xfb8e, 0x0423, 0x018d, 0x00b7, 0xf989, 0xfdd1, 0x068a
     .hword 0x0115, 0x03a5, 0x06bb, 0x01b5, 0xfa16, 0x00f2, 0x0668, 0x01b0
