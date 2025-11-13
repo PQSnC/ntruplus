@@ -219,7 +219,7 @@ int poly_baseinv(poly *r, const poly *a)
 
 	for(size_t i = 0; i < NTRUPLUS_N/8; ++i)
 	{
-		result = baseinv(r->coeffs + 8*i, a->coeffs + 8*i, zetas[72 + i]);
+		result = baseinv(r->coeffs + 8*i, a->coeffs + 8*i, zetas[96 + i]);
 		if(result)
 		{
 			memset(r->coeffs, 0, sizeof(int16_t) * NTRUPLUS_N);
@@ -227,7 +227,7 @@ int poly_baseinv(poly *r, const poly *a)
 			return 1;
 		} 
 
-		result = baseinv(r->coeffs + 8*i + 4, a->coeffs + 8*i + 4, -zetas[72 + i]);
+		result = baseinv(r->coeffs + 8*i + 4, a->coeffs + 8*i + 4, -zetas[96 + i]);
 		if(result)
 		{
 			memset(r->coeffs, 0, sizeof(int16_t) * NTRUPLUS_N);
