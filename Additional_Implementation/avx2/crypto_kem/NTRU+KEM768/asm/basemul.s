@@ -372,6 +372,51 @@ add $64,  %rcx
 cmp %r8,  %rsi
 jb  _looptop_basemul
 
+mov %rdi, %r8
+sub $1536, %rdi
+
+vmovdqa _16xR2qinv(%rip), %ymm15
+vmovdqa _16xR2(%rip),     %ymm1
+
+.p2align 5
+_reduce_R2_loop:
+
+#load
+vmovdqa   (%rdi), %ymm2
+vmovdqa 32(%rdi), %ymm3
+vmovdqa 64(%rdi), %ymm4
+vmovdqa 96(%rdi), %ymm5
+
+#mul
+vpmullw %ymm15, %ymm2, %ymm11
+vpmullw %ymm15, %ymm3, %ymm12
+vpmullw %ymm15, %ymm4, %ymm13
+vpmullw %ymm15, %ymm5, %ymm14
+vpmulhw %ymm1,  %ymm2, %ymm2
+vpmulhw %ymm1,  %ymm3, %ymm3
+vpmulhw %ymm1,  %ymm4, %ymm4
+vpmulhw %ymm1,  %ymm5, %ymm5
+
+#reduce
+vpmulhw %ymm0,  %ymm11, %ymm11
+vpmulhw %ymm0,  %ymm12, %ymm12
+vpmulhw %ymm0,  %ymm13, %ymm13
+vpmulhw %ymm0,  %ymm14, %ymm14
+vpsubw  %ymm11, %ymm2,  %ymm2
+vpsubw  %ymm12, %ymm3,  %ymm3
+vpsubw  %ymm13, %ymm4,  %ymm4
+vpsubw  %ymm14, %ymm5,  %ymm5
+
+#store
+vmovdqa %ymm2,   (%rdi)
+vmovdqa %ymm3, 32(%rdi)
+vmovdqa %ymm4, 64(%rdi)
+vmovdqa %ymm5, 96(%rdi)
+
+add $128, %rdi
+cmp %r8,  %rdi
+jb  _reduce_R2_loop
+
 ret
 
 .section .note.GNU-stack,"",@progbits

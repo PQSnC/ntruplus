@@ -291,6 +291,37 @@ static void TEST_MODULE_CLOCK(void)
 	printf("==================================================\n\n");
 }
 
+void TEST_NTT()
+{
+	poly a, b, c;
+
+	// Initialize polynomials
+	for (int i = 0; i < NTRUPLUS_N; i++) {
+		a.coeffs[i] = 0;
+		b.coeffs[i] = 0;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		a.coeffs[i] = 1;
+		b.coeffs[i] = 1;
+	}
+
+	// Perform NTT on polynomial a
+	poly_ntt(&a, &a);
+	poly_ntt(&b, &b);
+
+	poly_basemul(&c, &a, &b);
+
+	poly_invntt(&c, &c);
+
+	// Print result
+	printf("Result of polynomial multiplication in normal domain:\n");
+	for (int i = 0; i < NTRUPLUS_N; i++) {
+		printf("%d ", c.coeffs[i]);
+	}
+	printf("\n");
+}
+
 int main(void)
 {
 	printf("================= BENCHMARK INFO =================\n");
@@ -309,5 +340,6 @@ int main(void)
 	TEST_CCA_KEM_CLOCK();
 	TEST_MODULE_CLOCK();
 
+//	TEST_NTT();
 	return 0;	
 }

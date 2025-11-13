@@ -729,6 +729,26 @@ vpsubw  %ymm13, %ymm8,  %ymm2
 vpsubw  %ymm14, %ymm9,  %ymm3
 
 #load
+vmovdqa _16xRinvqinv(%rip), %ymm9
+vmovdqa _16xRinv(%rip),     %ymm8
+
+#mul
+vpmullw %ymm9, %ymm1, %ymm4
+vpmullw %ymm9, %ymm2, %ymm5
+vpmullw %ymm9, %ymm3, %ymm6
+vpmulhw %ymm8, %ymm1, %ymm1
+vpmulhw %ymm8, %ymm2, %ymm2
+vpmulhw %ymm8, %ymm3, %ymm3
+
+#reduce
+vpmulhw %ymm0, %ymm4, %ymm4
+vpmulhw %ymm0, %ymm5, %ymm5
+vpmulhw %ymm0, %ymm6, %ymm6
+vpsubw  %ymm4, %ymm1, %ymm1
+vpsubw  %ymm5, %ymm2, %ymm2
+vpsubw  %ymm6, %ymm3, %ymm3
+
+#load
 vmovdqa   (%rdi), %ymm4
 vmovdqa 32(%rdi), %ymm5
 vmovdqa 64(%rdi), %ymm6

@@ -208,7 +208,7 @@ const int16_t zetas_inv[1632] __attribute__((aligned(32))) = {
 	 28626,  28626,    722,    722, -12929, -12929,     -1,     -1,
 	-16436, -16436,    460,    460, -28815, -28815,   1265,   1265,
 	  6938,   6938,  -1510,  -1510,  16436,  16436,   -460,   -460,
-	-30977, -30977,  -1665,  -1665,  15375,  15375,   1679,   1679
+	-30977, -30977,  -1665,  -1665,    341,    341,   -811,   -811
 };
 
 const int16_t *zetas_mul = zetas + 624;
@@ -223,7 +223,12 @@ const int16_t *zetas_mul = zetas + 624;
 
 #define Qm1div2 1728
 #define Qp1div2 1729
-#define R2modq 867
+
+#define R2 867
+#define R2qinv 2787
+#define Rinv -682
+#define Rinvqinv 29782
+
 const uint16_t _low_mask[16] __attribute__((aligned(32))) = {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW};
 const uint16_t _16xv[16] __attribute__((aligned(32))) = {V, V, V, V, V, V, V, V, V, V, V, V, V, V, V, V};
 const uint16_t _16xv2[16] __attribute__((aligned(32))) = {V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2, V2};
@@ -235,7 +240,10 @@ const uint16_t _16xqm1div2[16]  __attribute__((aligned(32))) = {Qm1div2, Qm1div2
 const uint16_t _16xqinv[16] __attribute__((aligned(32))) = {QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV, QINV};
 const uint16_t _16xw[16] __attribute__((aligned(32))) = {W, W, W, W, W, W, W, W, W, W, W, W, W, W, W, W};
 const uint16_t _16xwqinv[16] __attribute__((aligned(32))) = {WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV};
-const uint16_t _16xR2modq[16] __attribute__((aligned(32))) = {R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq, R2modq};
+const uint16_t _16xR2[16] __attribute__((aligned(32))) = {R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2};
+const uint16_t _16xR2qinv[16] __attribute__((aligned(32))) = {R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv};
+const uint16_t _16xRinv[16] __attribute__((aligned(32))) = {Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv};
+const uint16_t _16xRinvqinv[16] __attribute__((aligned(32))) = {Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv};
 #undef QINV
 #undef LOW
 #undef V
@@ -243,4 +251,7 @@ const uint16_t _16xR2modq[16] __attribute__((aligned(32))) = {R2modq, R2modq, R2
 #undef W
 #undef Qm1div2
 #undef Qp1div2
-#undef R2modq
+#undef R2
+#undef R2qinv
+#undef Rinv
+#undef Rinvqinv

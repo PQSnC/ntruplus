@@ -311,7 +311,7 @@ const int16_t zetas_inv[1224] __attribute__((aligned(32))) = {
 	   1100,   1100,   1612,   1612,   1763,   1763,   -157,   -157,
 	  -4872,  -4872,    248,    248,  -6938,  -6938,   1510,   1510,
 	  29782,  29782,   -682,   -682,   4872,   4872,   -248,   -248,
-	 -30977, -30977,  -1665,  -1665,  32095,  32095,    -33,    -33
+	 -30977, -30977,  -1665,  -1665,    227,    227,  -1693,  -1693
 };
 
 #define QINV 12929
@@ -324,6 +324,11 @@ const int16_t zetas_inv[1224] __attribute__((aligned(32))) = {
 
 #define Qm1div2 1728
 #define Qp1div2 1729
+
+#define R2 867
+#define R2qinv 2787
+#define Rinv -682
+#define Rinvqinv 29782
 
 const uint16_t _low_mask[16] __attribute__((aligned(32))) = {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW};
 
@@ -338,7 +343,10 @@ const uint16_t _16xqinv[16] __attribute__((aligned(32))) = {QINV, QINV, QINV, QI
 
 const uint16_t _16xw[16] __attribute__((aligned(32))) = {W, W, W, W, W, W, W, W, W, W, W, W, W, W, W, W};
 const uint16_t _16xwqinv[16] __attribute__((aligned(32))) = {WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV, WQINV};
-
+const uint16_t _16xR2[16] __attribute__((aligned(32))) = {R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2, R2};
+const uint16_t _16xR2qinv[16] __attribute__((aligned(32))) = {R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv};
+const uint16_t _16xRinv[16] __attribute__((aligned(32))) = {Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv};
+const uint16_t _16xRinvqinv[16] __attribute__((aligned(32))) = {Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv};
 #undef QINV
 #undef LOW
 #undef V
@@ -346,3 +354,7 @@ const uint16_t _16xwqinv[16] __attribute__((aligned(32))) = {WQINV, WQINV, WQINV
 #undef W
 #undef Qm1div2
 #undef Qp1div2
+#undef R2
+#undef R2qinv
+#undef Rinv
+#undef Rinvqinv

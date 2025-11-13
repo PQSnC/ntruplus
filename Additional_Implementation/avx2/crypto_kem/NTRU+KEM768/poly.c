@@ -2,7 +2,7 @@
 
 #include "params.h"
 #include "poly.h"
-#include "consts.h"
+//#include "consts.h"
 
 /*************************************************
 * Name:        poly_cbd1
@@ -213,6 +213,7 @@ int poly_sotp_inv(uint8_t msg[NTRUPLUS_N/8], const poly *a, const uint8_t buf[NT
 	return r;
 }
 
+/*
 void poly_basemul(poly * __restrict r, const poly * __restrict a, const poly * __restrict b)
 {
     const int16_t* zetas_ptr = zetas + 624;
@@ -584,3 +585,4 @@ void poly_basemul(poly * __restrict r, const poly * __restrict a, const poly * _
 
     return;
 }
+*/

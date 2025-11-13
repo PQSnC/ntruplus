@@ -47,7 +47,7 @@ int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 
 		r = poly_baseinv(&finv, &f);
 		poly_basemul(&h, &g, &finv);
-		r &= poly_baseinv(&hinv, &h);
+		r |= poly_baseinv(&hinv, &h);
 	} while(r);
 	
 	//pk
