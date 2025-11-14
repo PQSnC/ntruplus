@@ -81,6 +81,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 *              - const uint8_t *msg: pointer to input message
 *              - const uint8_t *buf: pointer to input random
 **************************************************/
+/*
 void poly_sotp(poly *r, const uint8_t msg[NTRUPLUS_N/8], const uint8_t buf[NTRUPLUS_N/4])
 {
     uint8_t tmp[NTRUPLUS_N/4];
@@ -97,7 +98,7 @@ void poly_sotp(poly *r, const uint8_t msg[NTRUPLUS_N/8], const uint8_t buf[NTRUP
 
 	poly_cbd1(r, tmp);
 }
-
+*/
 /*************************************************
 * Name:        poly_sotp_inv
 *
