@@ -291,6 +291,32 @@ static void TEST_MODULE_CLOCK(void)
 	printf("==================================================\n\n");
 }
 
+void TEST_CBD()
+{
+	uint8_t buf[NTRUPLUS_N / 4] = {0};
+	poly a;
+
+	printf("=============== CBD1 TEST ===============\n");
+
+	for (size_t i = 0; i < NTRUPLUS_N / 4; i++)
+	{
+		buf[i]	= 0;
+	}
+	
+	buf[0] = 0x0ff;
+	buf[1] = 0x0ff;
+
+	poly_cbd1(&a, buf);
+
+	for (size_t i = 0; i < NTRUPLUS_N; i++)
+	{
+		printf("%3d ", a.coeffs[i]);
+		if(i%16 == 15) printf("\n");
+	}
+	printf("\n");
+	printf("=========================================\n\n");
+}
+
 int main(void)
 {
 	printf("================= BENCHMARK INFO =================\n");
@@ -308,6 +334,7 @@ int main(void)
 	TEST_CCA_KEM();
 	TEST_CCA_KEM_CLOCK();
 	TEST_MODULE_CLOCK();
+	//TEST_CBD();
 
 	return 0;	
 }

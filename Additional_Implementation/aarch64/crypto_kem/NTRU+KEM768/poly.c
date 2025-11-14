@@ -1,45 +1,5 @@
-#include <stdint.h>
-#include "params.h"
 #include "poly.h"
-#include "symmetric.h"
-
-extern void poly_frombytes_asm(poly *r, const uint8_t a[NTRUPLUS_POLYBYTES]);
-extern void poly_tobytes_asm(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a);
-extern void poly_shuffle_asm(poly* r, const poly* a);
-extern void poly_shuffle2_asm(poly* r, const poly* a);
-
-/*************************************************
-* Name:        poly_tobytes
-*
-* Description: Serialization of a polynomial
-*
-* Arguments:   - uint8_t *r: pointer to output byte array
-*                            (needs space for NTRUPLUS_POLYBYTES bytes)
-*              - poly *a:    pointer to input polynomial
-**************************************************/
-void poly_tobytes(uint8_t r[NTRUPLUS_POLYBYTES], const poly *a)
-{
-	poly t;
-
-	poly_shuffle2_asm(&t,a);
-	poly_tobytes_asm(r, &t);
-}
-
-/*************************************************
-* Name:        poly_frombytes
-*
-* Description: De-serialization of a polynomial;
-*              inverse of poly_tobytes
-*
-* Arguments:   - poly *r:          pointer to output polynomial
-*              - const uint8_t *a: pointer to input byte array
-*                                  (of NTRUPLUS_POLYBYTES bytes)
-**************************************************/
-void poly_frombytes(poly *r, const uint8_t a[NTRUPLUS_POLYBYTES])
-{
-	poly_frombytes_asm(r, a);
-	poly_shuffle_asm(r, r); 
-}
+#include <stddef.h>
 
 /*************************************************
 * Name:        poly_cbd1
@@ -67,6 +27,70 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 
 			t1 >>= 1;   
 			t2 >>= 1;
+		}
+	}
+}
+
+void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
+{
+	for(size_t i = 0; i < NTRUPLUS_N / 16; i++)
+	{
+		uint16_t f0 = (buf[2*i+1] << 8) | buf[2*i];
+		uint16_t f1 = (buf[2*i+1 + NTRUPLUS_N / 8] << 8) | buf[2*i + NTRUPLUS_N / 8];
+
+		uint16_t t0 = (f0 & 0x5555) + 0x5555;
+		uint16_t s0 = f1 & 0x5555;
+		s0 = t0 - s0;
+
+		f0 = f0 >> 1;
+		f1 = f1 >> 1;
+
+		uint16_t t1 = (f0 & 0x5555) + 0x5555;
+		uint16_t s1 = f1 & 0x5555;
+		s1 = t1 - s1;
+
+		for (size_t j = 0; j < 8; j++)
+		{
+			uint16_t t2 = s0 & 0x03;
+			uint16_t t3 = s1 & 0x03;
+
+			r->coeffs[16*i + 2*j    ] = t2 - 1;
+			r->coeffs[16*i + 2*j + 1] = t3 - 1;
+
+			s0 = s0 >> 2;
+			s1 = s1 >> 2;
+		}
+	}
+}
+
+void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
+{
+	for(size_t i = 0; i < NTRUPLUS_N / 8; i++)
+	{
+		uint8_t f0 = buf[i];
+		uint8_t f1 = buf[i + NTRUPLUS_N / 8];
+
+		uint8_t t0 = (f0 & 0x55) + 0x55;
+		uint8_t s0 = f1 & 0x55;
+		s0 = t0 - s0;
+
+		f0 = f0 >> 1;
+		f1 = f1 >> 1;
+
+		uint8_t t1 = (f0 & 0x55) + 0x55;
+		uint8_t s1 = f1 & 0x55;
+		s1 = t1 - s1;
+
+		for (size_t j = 0; j < 4; j++)
+		{
+			uint8_t t2 = s0 & 0x03;
+			uint8_t t3 = s1 & 0x03;
+
+			r->coeffs[8*i + 2*j    ] = t2 - 1;
+			r->coeffs[8*i + 2*j + 1] = t3 - 1;
+
+			s0 = s0 >> 2;
+			s1 = s1 >> 2;
 		}
 	}
 }

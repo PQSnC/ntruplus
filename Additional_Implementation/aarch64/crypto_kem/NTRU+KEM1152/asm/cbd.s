@@ -1,3 +1,4 @@
+/*
 .global poly_cbd1
 .global _poly_cbd1
 poly_cbd1:
@@ -6,376 +7,261 @@ _poly_cbd1:
     src       .req x1 
     counter   .req x8
 
-    movi v0.8h, #1
+    movi    v0.16b, #0x55
+    movi    v1.16b, #0x03
+    movi    v2.16b, #0x01
 
-    mov counter, #2048
+    mov counter, #2304
 
 _loop_cbd:
     #load
-    ldr q3, [src, #0]
-    ldr q4, [src, #16]
-    ldr q5, [src, #144]
-    ldr q6, [src, #160]
-    add src, src, #32
+    ldr q5, [src, #0]
+    ldr q6, [src, #144]
+    add src, src, #16
 
-    and v11.16b, v3.16b, v0.16b
-    and v12.16b, v4.16b, v0.16b
-    and v13.16b, v5.16b, v0.16b
-    and v14.16b, v6.16b, v0.16b
+    ushr v7.16b, v5.16b, #1     
+    ushr v8.16b, v6.16b, #1
 
-    ushr v15.8h, v3.8h, #1     
-    ushr v16.8h, v4.8h, #1
-
-    sub  v23.8h, v11.8h, v13.8h
-    sub  v24.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #1 
-    ushr v18.8h, v6.8h, #1
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #2     
-    ushr  v8.8h, v4.8h, #2
-
-    sub v25.8h, v19.8h, v21.8h
-    sub v26.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #2 
-    ushr v10.8h, v6.8h, #2
-
+    and  v9.16b,  v5.16b, v0.16b
+    and v10.16b,  v6.16b, v0.16b
     and v11.16b,  v7.16b, v0.16b
     and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
 
-    ushr v15.8h, v3.8h, #3  
-    ushr v16.8h, v4.8h, #3
+    add  v9.16b,  v9.16b, v0.16b
+    add v11.16b, v11.16b, v0.16b
 
-    sub  v27.8h, v11.8h, v13.8h
-    sub  v28.8h, v12.8h, v14.8h
+    sub v5.16b,  v9.16b, v10.16b
+    sub v6.16b, v11.16b, v12.16b
 
-    ushr v17.8h, v5.8h, #3 
-    ushr v18.8h, v6.8h, #3
+    #extract 1
+    and v7.16b, v5.16b, v1.16b
+    and v8.16b, v6.16b, v1.16b
 
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
+    sub v7.16b, v7.16b, v2.16b
+    sub v8.16b, v8.16b, v2.16b
 
-    ushr  v7.8h, v3.8h, #4     
-    ushr  v8.8h, v4.8h, #4
+    ushr v5.16b, v5.16b, #2
+    ushr v6.16b, v6.16b, #2
 
-    sub v29.8h, v19.8h, v21.8h
-    sub v30.8h, v20.8h, v22.8h
+    #extract 2
+    and  v9.16b, v5.16b, v1.16b
+    and v10.16b, v6.16b, v1.16b
 
-    ushr  v9.8h, v5.8h, #4 
-    ushr v10.8h, v6.8h, #4    
+    sub  v9.16b,  v9.16b, v2.16b
+    sub v10.16b, v10.16b, v2.16b
+
+    ushr v5.16b, v5.16b, #2
+    ushr v6.16b, v6.16b, #2
+
+    #extract 3
+    and v11.16b, v5.16b, v1.16b
+    and v12.16b, v6.16b, v1.16b
+
+    sub v11.16b, v11.16b, v2.16b
+    sub v12.16b, v12.16b, v2.16b
+
+    ushr v5.16b, v5.16b, #2
+    ushr v6.16b, v6.16b, #2
+
+    #extract 4
+    and v13.16b, v5.16b, v1.16b
+    and v14.16b, v6.16b, v1.16b
+
+    sub v13.16b, v13.16b, v2.16b
+    sub v14.16b, v14.16b, v2.16b
+
+    #shuffles
+    trn1 v15.16b,  v7.16b,  v8.16b
+    trn1 v16.16b,  v9.16b, v10.16b
+    trn1 v17.16b, v11.16b, v12.16b
+    trn1 v18.16b, v13.16b, v14.16b
+
+    trn2 v19.16b,  v7.16b,  v8.16b
+    trn2 v20.16b,  v9.16b, v10.16b
+    trn2 v21.16b, v11.16b, v12.16b
+    trn2 v22.16b, v13.16b, v14.16b
+
+    trn1 v23.8h, v15.8h, v16.8h
+    trn1 v24.8h, v17.8h, v18.8h
+    trn1 v25.8h, v19.8h, v20.8h
+    trn1 v26.8h, v21.8h, v22.8h
+
+    trn2 v27.8h, v15.8h, v16.8h
+    trn2 v28.8h, v17.8h, v18.8h
+    trn2 v29.8h, v19.8h, v20.8h
+    trn2 v30.8h, v21.8h, v22.8h
+
+    trn1 v31.4s, v23.4s, v24.4s
+    trn1  v5.4s, v25.4s, v26.4s
+    trn1  v6.4s, v27.4s, v28.4s
+    trn1  v7.4s, v29.4s, v30.4s
+
+    trn2  v8.4s, v23.4s, v24.4s
+    trn2  v9.4s, v25.4s, v26.4s
+    trn2 v10.4s, v27.4s, v28.4s
+    trn2 v11.4s, v29.4s, v30.4s
+
+    #expand
+    sshll  v12.8h, v31.8b, #0
+    sshll  v13.8h,  v5.8b, #0
+    sshll  v14.8h,  v6.8b, #0
+    sshll  v15.8h,  v7.8b, #0
+
+    sshll  v16.8h, v8.8b,  #0
+    sshll  v17.8h, v9.8b,  #0
+    sshll  v18.8h, v10.8b, #0
+    sshll  v19.8h, v11.8b, #0
+
+    sshll2  v20.8h, v31.16b, #0
+    sshll2  v21.8h,  v5.16b, #0
+    sshll2  v22.8h,  v6.16b, #0
+    sshll2  v23.8h,  v7.16b, #0
+
+    sshll2  v24.8h, v8.16b,  #0
+    sshll2  v25.8h, v9.16b,  #0
+    sshll2  v26.8h, v10.16b, #0
+    sshll2  v27.8h, v11.16b, #0
 
     #store
-    st1 {v23.8h - v26.8h},  [dst], #64
-    st1 {v27.8h - v30.8h},  [dst], #64
+    st1 {v12.8h - v15.8h}, [dst], #64
+    st1 {v16.8h - v19.8h}, [dst], #64
+    st1 {v20.8h - v23.8h}, [dst], #64
+    st1 {v24.8h - v27.8h}, [dst], #64
 
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #5
-    ushr v16.8h, v4.8h, #5
-
-    sub  v23.8h, v11.8h, v13.8h
-    sub  v24.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #5 
-    ushr v18.8h, v6.8h, #5
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #6  
-    ushr  v8.8h, v4.8h, #6
-
-    sub v25.8h, v19.8h, v21.8h
-    sub v26.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #6 
-    ushr v10.8h, v6.8h, #6
-
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #7
-    ushr v16.8h, v4.8h, #7
-
-    sub  v27.8h, v11.8h, v13.8h
-    sub  v28.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #7 
-    ushr v18.8h, v6.8h, #7
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #8
-    ushr  v8.8h, v4.8h, #8
-
-    sub v29.8h, v19.8h, v21.8h
-    sub v30.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #8 
-    ushr v10.8h, v6.8h, #8
-
-    #store
-    st1 {v23.8h - v26.8h},  [dst], #64
-    st1 {v27.8h - v30.8h},  [dst], #64
-
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #9
-    ushr v16.8h, v4.8h, #9
-
-    sub  v23.8h, v11.8h, v13.8h
-    sub  v24.8h, v12.8h, v14.8h
-    
-    ushr v17.8h, v5.8h, #9 
-    ushr v18.8h, v6.8h, #9
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #10
-    ushr  v8.8h, v4.8h, #10
-
-    sub v25.8h, v19.8h, v21.8h
-    sub v26.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #10
-    ushr v10.8h, v6.8h, #10
-
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #11
-    ushr v16.8h, v4.8h, #11
-
-    sub  v27.8h, v11.8h, v13.8h
-    sub  v28.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #11
-    ushr v18.8h, v6.8h, #11
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #12     
-    ushr  v8.8h, v4.8h, #12
-
-    sub v29.8h, v19.8h, v21.8h
-    sub v30.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #12 
-    ushr v10.8h, v6.8h, #12
-
-    #store
-    st1 {v23.8h - v26.8h},  [dst], #64
-    st1 {v27.8h - v30.8h},  [dst], #64
-
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #13
-    ushr v16.8h, v4.8h, #13
-
-    sub  v23.8h, v11.8h, v13.8h
-    sub  v24.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #13 
-    ushr v18.8h, v6.8h, #13
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    ushr  v7.8h, v3.8h, #14
-    ushr  v8.8h, v4.8h, #14
-
-    sub v25.8h, v19.8h, v21.8h
-    sub v26.8h, v20.8h, v22.8h
-
-    ushr  v9.8h, v5.8h, #14
-    ushr v10.8h, v6.8h, #14
-
-    and v11.16b,  v7.16b, v0.16b
-    and v12.16b,  v8.16b, v0.16b
-    and v13.16b,  v9.16b, v0.16b
-    and v14.16b, v10.16b, v0.16b
-
-    ushr v15.8h, v3.8h, #15
-    ushr v16.8h, v4.8h, #15
-
-    sub  v27.8h, v11.8h, v13.8h
-    sub  v28.8h, v12.8h, v14.8h
-
-    ushr v17.8h, v5.8h, #15
-    ushr v18.8h, v6.8h, #15
-
-    and v19.16b, v15.16b, v0.16b
-    and v20.16b, v16.16b, v0.16b
-    and v21.16b, v17.16b, v0.16b
-    and v22.16b, v18.16b, v0.16b
-
-    sub v29.8h, v19.8h, v21.8h
-    sub v30.8h, v20.8h, v22.8h
-
-    #store
-    st1 {v23.8h - v26.8h},  [dst], #64
-    st1 {v27.8h - v30.8h},  [dst], #64
-
-    subs counter, counter, #512
+    subs counter, counter, #256
     b.ne _loop_cbd
 
+    .unreq    dst
+    .unreq    src
+    .unreq    counter
+
+    ret
+*/
+
+.global poly_cbd1
+.global _poly_cbd1
+poly_cbd1:
+_poly_cbd1:
+    dst       .req x0
+    src       .req x1 
+    counter   .req x8
+
+    movi    v0.16b, #0x55
+    movi    v1.16b, #0x03
+    movi    v2.16b, #0x01
+
+    mov counter, #2304
+
+_loop_cbd:
     #load
     ldr q5, [src, #0]
     ldr q6, [src, #144]
+    add src, src, #16
 
-    ushr  v8.8h, v5.8h, #1 
-    ushr  v9.8h, v5.8h, #2
-    ushr v10.8h, v5.8h, #3
+    ushr v7.16b, v5.16b, #1     
+    ushr v8.16b, v6.16b, #1
 
-    ushr v12.8h, v6.8h, #1 
-    ushr v13.8h, v6.8h, #2
-    ushr v14.8h, v6.8h, #3
+    and  v9.16b,  v5.16b, v0.16b
+    and v10.16b,  v6.16b, v0.16b
+    and v11.16b,  v7.16b, v0.16b
+    and v12.16b,  v8.16b, v0.16b
 
-    and  v7.16b,  v5.16b, v0.16b
-    and  v8.16b,  v8.16b, v0.16b
-    and  v9.16b,  v9.16b, v0.16b
-    and v10.16b, v10.16b, v0.16b
-    and v11.16b,  v6.16b, v0.16b
-    and v12.16b, v12.16b, v0.16b
-    and v13.16b, v13.16b, v0.16b
-    and v14.16b, v14.16b, v0.16b
+    add  v9.16b,  v9.16b, v0.16b
+    add v11.16b, v11.16b, v0.16b
 
-    sub v7.8h, v7.8h, v11.8h
-    sub v8.8h, v8.8h, v12.8h
-    sub v9.8h, v9.8h, v13.8h
-    sub v10.8h, v10.8h, v14.8h
+    sub v5.16b,  v9.16b, v10.16b
+    sub v6.16b, v11.16b, v12.16b
 
-    #store
-    str q7,  [dst, #0*16]
-    str q8,  [dst, #1*16]
-    str q9,  [dst, #2*16]
-    str q10, [dst, #3*16]
+    ushr v7.16b, v5.16b, #2
+    ushr v8.16b, v6.16b, #2
 
-    ushr  v7.8h, v5.8h, #4
-    ushr  v8.8h, v5.8h, #5
-    ushr  v9.8h, v5.8h, #6
-    ushr v10.8h, v5.8h, #7
+    #extract 1
+    and  v9.16b, v5.16b, v1.16b
+    and v10.16b, v6.16b, v1.16b
+    and v11.16b, v7.16b, v1.16b
+    and v12.16b, v8.16b, v1.16b
 
-    ushr v11.8h, v6.8h, #4
-    ushr v12.8h, v6.8h, #5 
-    ushr v13.8h, v6.8h, #6
-    ushr v14.8h, v6.8h, #7
+    sub  v9.16b,  v9.16b, v2.16b
+    sub v10.16b, v10.16b, v2.16b
+    sub v11.16b, v11.16b, v2.16b
+    sub v12.16b, v12.16b, v2.16b
 
-    and  v7.16b,  v7.16b, v0.16b
-    and  v8.16b,  v8.16b, v0.16b
-    and  v9.16b,  v9.16b, v0.16b
-    and v10.16b, v10.16b, v0.16b
-    and v11.16b, v11.16b, v0.16b
-    and v12.16b, v12.16b, v0.16b
-    and v13.16b, v13.16b, v0.16b
-    and v14.16b, v14.16b, v0.16b
+    ushr v5.16b, v5.16b, #4
+    ushr v6.16b, v6.16b, #4
+    ushr v7.16b, v7.16b, #4
+    ushr v8.16b, v8.16b, #4
 
-    sub v7.8h, v7.8h, v11.8h
-    sub v8.8h, v8.8h, v12.8h
-    sub v9.8h, v9.8h, v13.8h
-    sub v10.8h, v10.8h, v14.8h
+    #extract 2
+    and v13.16b, v5.16b, v1.16b
+    and v14.16b, v6.16b, v1.16b
+    and v15.16b, v7.16b, v1.16b
+    and v16.16b, v8.16b, v1.16b
 
-    #store
-    str q7,  [dst, #4*16]
-    str q8,  [dst, #5*16]
-    str q9,  [dst, #6*16]
-    str q10, [dst, #7*16]
+    sub v13.16b, v13.16b, v2.16b
+    sub v14.16b, v14.16b, v2.16b
+    sub v15.16b, v15.16b, v2.16b
+    sub v16.16b, v16.16b, v2.16b
 
-    ushr  v7.8h, v5.8h, #8
-    ushr  v8.8h, v5.8h, #9
-    ushr  v9.8h, v5.8h, #10
-    ushr v10.8h, v5.8h, #11
+    #shuffles
+    trn1 v17.16b,  v9.16b, v10.16b
+    trn1 v18.16b, v11.16b, v12.16b
+    trn1 v19.16b, v13.16b, v14.16b
+    trn1 v20.16b, v15.16b, v16.16b
 
-    ushr v11.8h, v6.8h, #8
-    ushr v12.8h, v6.8h, #9 
-    ushr v13.8h, v6.8h, #10
-    ushr v14.8h, v6.8h, #11
+    trn2 v21.16b,  v9.16b, v10.16b
+    trn2 v22.16b, v11.16b, v12.16b
+    trn2 v23.16b, v13.16b, v14.16b
+    trn2 v24.16b, v15.16b, v16.16b
 
-    and  v7.16b,  v7.16b, v0.16b
-    and  v8.16b,  v8.16b, v0.16b
-    and  v9.16b,  v9.16b, v0.16b
-    and v10.16b, v10.16b, v0.16b
-    and v11.16b, v11.16b, v0.16b
-    and v12.16b, v12.16b, v0.16b
-    and v13.16b, v13.16b, v0.16b
-    and v14.16b, v14.16b, v0.16b
+    trn1 v25.8h, v17.8h, v18.8h
+    trn1 v26.8h, v19.8h, v20.8h
+    trn1 v27.8h, v21.8h, v22.8h
+    trn1 v28.8h, v23.8h, v24.8h
 
-    sub v7.8h, v7.8h, v11.8h
-    sub v8.8h, v8.8h, v12.8h
-    sub v9.8h, v9.8h, v13.8h
-    sub v10.8h, v10.8h, v14.8h
+    trn2 v29.8h, v17.8h, v18.8h
+    trn2 v30.8h, v19.8h, v20.8h
+    trn2 v31.8h, v21.8h, v22.8h
+    trn2  v5.8h, v23.8h, v24.8h
 
-    #store
-    str q7,  [dst, #8*16]
-    str q8,  [dst, #9*16]
-    str q9,  [dst, #10*16]
-    str q10, [dst, #11*16]
+    trn1 v6.4s, v25.4s, v26.4s
+    trn1 v7.4s, v27.4s, v28.4s
+    trn1 v8.4s, v29.4s, v30.4s
+    trn1 v9.4s, v31.4s,  v5.4s
 
-    ushr  v7.8h, v5.8h, #12
-    ushr  v8.8h, v5.8h, #13
-    ushr  v9.8h, v5.8h, #14
-    ushr v10.8h, v5.8h, #15
+    trn2 v10.4s, v25.4s, v26.4s
+    trn2 v11.4s, v27.4s, v28.4s
+    trn2 v12.4s, v29.4s, v30.4s
+    trn2 v13.4s, v31.4s,  v5.4s
 
-    ushr v11.8h, v6.8h, #12
-    ushr v12.8h, v6.8h, #13
-    ushr v13.8h, v6.8h, #14
-    ushr v14.8h, v6.8h, #15
+    #expand
+    sshll  v14.8h, v6.8b, #0
+    sshll  v15.8h, v7.8b, #0
+    sshll  v16.8h, v8.8b, #0
+    sshll  v17.8h, v9.8b, #0
 
-    and  v7.16b,  v7.16b, v0.16b
-    and  v8.16b,  v8.16b, v0.16b
-    and  v9.16b,  v9.16b, v0.16b
-    and v10.16b, v10.16b, v0.16b
-    and v11.16b, v11.16b, v0.16b
-    and v12.16b, v12.16b, v0.16b
-    and v13.16b, v13.16b, v0.16b
-    and v14.16b, v14.16b, v0.16b
+    sshll  v18.8h, v10.8b, #0
+    sshll  v19.8h, v11.8b, #0
+    sshll  v20.8h, v12.8b, #0
+    sshll  v21.8h, v13.8b, #0
 
-    sub v7.8h, v7.8h, v11.8h
-    sub v8.8h, v8.8h, v12.8h
-    sub v9.8h, v9.8h, v13.8h
-    sub v10.8h, v10.8h, v14.8h
+    sshll2  v22.8h, v6.16b, #0
+    sshll2  v23.8h, v7.16b, #0
+    sshll2  v24.8h, v8.16b, #0
+    sshll2  v25.8h, v9.16b, #0
+
+    sshll2  v26.8h, v10.16b, #0
+    sshll2  v27.8h, v11.16b, #0
+    sshll2  v28.8h, v12.16b, #0
+    sshll2  v29.8h, v13.16b, #0
 
     #store
-    str q7,  [dst, #12*16]
-    str q8,  [dst, #13*16]
-    str q9,  [dst, #14*16]
-    str q10, [dst, #15*16]
+    st1 {v14.8h - v17.8h}, [dst], #64
+    st1 {v18.8h - v21.8h}, [dst], #64
+    st1 {v22.8h - v25.8h}, [dst], #64
+    st1 {v26.8h - v29.8h}, [dst], #64
+
+    subs counter, counter, #256
+    b.ne _loop_cbd
 
     .unreq    dst
     .unreq    src
