@@ -267,7 +267,7 @@ _loop_sotp:
 
     ret
 
-/*
+
 .global poly_sotp_inv
 .global _poly_sotp_inv
 poly_sotp_inv:
@@ -278,265 +278,141 @@ _poly_sotp_inv:
     counter   .req x8
 
     #load
-    movi v0.8h, #1
+    movi    v0.16b, #0x55
+    movi    v1.16b, #0x01
+    movi    v2.16b, #0xff
 
-    eor v1.16b, v1.16b, v1.16b
+    #global error
+    movi    v3.16b, #0xff
 
     mov counter, #1536
 
 _loop_sotp_inv:
-    eor v2.16b, v2.16b, v2.16b
-    eor v3.16b, v3.16b, v3.16b
+    #load
+    ld1 { v5.8h -  v8.8h}, [src1], #64
+    ld1 { v9.8h - v12.8h}, [src1], #64
+    ld1 {v13.8h - v16.8h}, [src1], #64
+    ld1 {v17.8h - v20.8h}, [src1], #64
+
+    sqxtn  v21.8b, v5.8h
+    sqxtn  v22.8b, v6.8h
+    sqxtn  v23.8b, v7.8h
+    sqxtn  v24.8b, v8.8h
+
+    sqxtn  v25.8b,  v9.8h
+    sqxtn  v26.8b, v10.8h
+    sqxtn  v27.8b, v11.8h
+    sqxtn  v28.8b, v12.8h
+
+    sqxtn2 v21.16b, v13.8h
+    sqxtn2 v22.16b, v14.8h
+    sqxtn2 v23.16b, v15.8h
+    sqxtn2 v24.16b, v16.8h
+
+    sqxtn2 v25.16b, v17.8h
+    sqxtn2 v26.16b, v18.8h
+    sqxtn2 v27.16b, v19.8h
+    sqxtn2 v28.16b, v20.8h
+
+    #shuffles
+    trn1  v29.4s, v21.4s, v25.4s
+    trn2  v30.4s, v21.4s, v25.4s
+    trn1  v31.4s, v22.4s, v26.4s
+    trn2   v5.4s, v22.4s, v26.4s
+
+    trn1  v6.4s, v23.4s, v27.4s
+    trn2  v7.4s, v23.4s, v27.4s
+    trn1  v8.4s, v24.4s, v28.4s
+    trn2  v9.4s, v24.4s, v28.4s
+
+    trn1 v10.8h, v29.8h, v6.8h
+    trn2 v11.8h, v29.8h, v6.8h
+    trn1 v12.8h, v30.8h, v7.8h
+    trn2 v13.8h, v30.8h, v7.8h
+
+    trn1 v14.8h, v31.8h, v8.8h
+    trn2 v15.8h, v31.8h, v8.8h
+    trn1 v16.8h,  v5.8h, v9.8h
+    trn2 v17.8h,  v5.8h, v9.8h
+
+    trn1 v18.16b, v10.16b, v14.16b
+    trn2 v19.16b, v10.16b, v14.16b
+    trn1 v20.16b, v11.16b, v15.16b
+    trn2 v21.16b, v11.16b, v15.16b
+
+    trn1 v22.16b, v12.16b, v16.16b
+    trn2 v23.16b, v12.16b, v16.16b
+    trn1 v24.16b, v13.16b, v17.16b
+    trn2 v25.16b, v13.16b, v17.16b
+
+    add v18.16b, v18.16b, v1.16b
+    add v19.16b, v19.16b, v1.16b
+    add v20.16b, v20.16b, v1.16b
+    add v21.16b, v21.16b, v1.16b
+
+    add v22.16b, v22.16b, v1.16b
+    add v23.16b, v23.16b, v1.16b
+    add v24.16b, v24.16b, v1.16b
+    add v25.16b, v25.16b, v1.16b
+
+    shl v20.16b, v20.16b, #2
+    shl v21.16b, v21.16b, #2
+    shl v22.16b, v22.16b, #4
+    shl v23.16b, v23.16b, #4
+    shl v24.16b, v24.16b, #6
+    shl v25.16b, v25.16b, #6
+
+    eor v26.16b, v18.16b, v20.16b
+    eor v27.16b, v19.16b, v21.16b
+    eor v28.16b, v22.16b, v24.16b
+    eor v29.16b, v23.16b, v25.16b
+
+    eor v30.16b, v26.16b, v28.16b
+    eor v31.16b, v27.16b, v29.16b
 
     #load
-    ldr q4, [src2,  #0]
-    ldr q5, [src2, #16]
-    ldr q6, [src2, #96]
-    ldr q7, [src2, #112]
+    ldr q5, [src2], #16
+    ldr q6, [src2, #80]
 
-    #load
-    ld1 {v8.8h - v11.8h},  [src1], #64
-    ld1 {v12.8h - v15.8h}, [src1], #64
+    ushr v7.16b, v6.16b, #1
 
-    ushr v18.8h, v6.8h, #1
-    ushr v20.8h, v6.8h, #2
-    ushr v22.8h, v6.8h, #3
-    ushr v19.8h, v7.8h, #1
-    ushr v21.8h, v7.8h, #2
-    ushr v23.8h, v7.8h, #3
+    and v8.16b, v6.16b, v0.16b
+    and v9.16b, v7.16b, v0.16b
 
-    and v16.16b,  v6.16b, v0.16b
-    and v18.16b, v18.16b, v0.16b
-    and v20.16b, v20.16b, v0.16b
-    and v22.16b, v22.16b, v0.16b
-    and v17.16b,  v7.16b, v0.16b
-    and v19.16b, v19.16b, v0.16b
-    and v21.16b, v21.16b, v0.16b
-    and v23.16b, v23.16b, v0.16b
+    add v10.16b, v30.16b, v8.16b
+    add v11.16b, v31.16b, v9.16b
 
-    add  v8.8h,  v8.8h, v16.8h
-    add v10.8h, v10.8h, v18.8h
-    add v12.8h, v12.8h, v20.8h
-    add v14.8h, v14.8h, v22.8h
-    add  v9.8h,  v9.8h, v17.8h
-    add v11.8h, v11.8h, v19.8h    
-    add v13.8h, v13.8h, v21.8h    
-    add v15.8h, v15.8h, v23.8h
+    #handling error
+    ushr v12.16b, v10.16b, #1
+    ushr v13.16b, v11.16b, #1
 
-    orr  v24.16b,  v8.16b, v10.16b
-    orr  v25.16b, v12.16b, v14.16b
-    orr  v26.16b,  v9.16b, v11.16b
-    orr  v27.16b, v13.16b, v15.16b
-    orr  v28.16b, v24.16b, v25.16b
-    orr  v29.16b, v26.16b, v27.16b
-    orr  v30.16b, v28.16b, v29.16b
-    orr   v1.16b,  v1.16b, v30.16b
+    eor v14.16b, v10.16b, v12.16b
+    eor v15.16b, v11.16b, v13.16b
 
-    shl v10.8h, v10.8h, #1
-    shl v12.8h, v12.8h, #2
-    shl v14.8h, v14.8h, #3
-    shl v11.8h, v11.8h, #1
-    shl v13.8h, v13.8h, #2
-    shl v15.8h, v15.8h, #3
+    and v16.16b, v14.16b, v15.16b
+    and  v3.16b,  v3.16b, v16.16b
 
-    eor v2.16b, v2.16b, v8.16b
-    eor v2.16b, v2.16b, v10.16b
-    eor v2.16b, v2.16b, v12.16b
-    eor v2.16b, v2.16b, v14.16b
-    eor v3.16b, v3.16b, v9.16b
-    eor v3.16b, v3.16b, v11.16b
-    eor v3.16b, v3.16b, v13.16b
-    eor v3.16b, v3.16b, v15.16b
+    #extract bits
+    and v10.16b, v10.16b, v0.16b
+    and v11.16b, v11.16b, v0.16b
+    shl v17.16b, v11.16b, #1
 
-    #load
-    ld1 {v8.8h - v11.8h},  [src1], #64
-    ld1 {v12.8h - v15.8h}, [src1], #64
+    eor v18.16b, v10.16b, v17.16b
+    eor v19.16b, v18.16b, v2.16b 
 
-    ushr v16.8h, v6.8h, #4
-    ushr v18.8h, v6.8h, #5
-    ushr v20.8h, v6.8h, #6
-    ushr v22.8h, v6.8h, #7
-    ushr v17.8h, v7.8h, #4
-    ushr v19.8h, v7.8h, #5
-    ushr v21.8h, v7.8h, #6
-    ushr v23.8h, v7.8h, #7
-
-    and v16.16b, v16.16b, v0.16b
-    and v18.16b, v18.16b, v0.16b
-    and v20.16b, v20.16b, v0.16b
-    and v22.16b, v22.16b, v0.16b
-    and v17.16b, v17.16b, v0.16b
-    and v19.16b, v19.16b, v0.16b
-    and v21.16b, v21.16b, v0.16b
-    and v23.16b, v23.16b, v0.16b
-
-    add  v8.8h,  v8.8h, v16.8h
-    add v10.8h, v10.8h, v18.8h
-    add v12.8h, v12.8h, v20.8h
-    add v14.8h, v14.8h, v22.8h
-    add  v9.8h,  v9.8h, v17.8h
-    add v11.8h, v11.8h, v19.8h    
-    add v13.8h, v13.8h, v21.8h    
-    add v15.8h, v15.8h, v23.8h
-
-    orr  v24.16b,  v8.16b, v10.16b
-    orr  v25.16b, v12.16b, v14.16b
-    orr  v26.16b,  v9.16b, v11.16b
-    orr  v27.16b, v13.16b, v15.16b
-    orr  v28.16b, v24.16b, v25.16b
-    orr  v29.16b, v26.16b, v27.16b
-    orr  v30.16b, v28.16b, v29.16b
-    orr   v1.16b,  v1.16b, v30.16b
-
-    shl  v8.8h,  v8.8h, #4
-    shl v10.8h, v10.8h, #5
-    shl v12.8h, v12.8h, #6
-    shl v14.8h, v14.8h, #7
-    shl  v9.8h,  v9.8h, #4
-    shl v11.8h, v11.8h, #5
-    shl v13.8h, v13.8h, #6
-    shl v15.8h, v15.8h, #7
-
-    eor v2.16b, v2.16b, v8.16b
-    eor v2.16b, v2.16b, v10.16b
-    eor v2.16b, v2.16b, v12.16b
-    eor v2.16b, v2.16b, v14.16b
-    eor v3.16b, v3.16b, v9.16b
-    eor v3.16b, v3.16b, v11.16b
-    eor v3.16b, v3.16b, v13.16b
-    eor v3.16b, v3.16b, v15.16b
-
-    #load
-    ld1 {v8.8h - v11.8h},  [src1], #64
-    ld1 {v12.8h - v15.8h}, [src1], #64
-
-    ushr v16.8h, v6.8h, #8
-    ushr v18.8h, v6.8h, #9
-    ushr v20.8h, v6.8h, #10
-    ushr v22.8h, v6.8h, #11
-    ushr v17.8h, v7.8h, #8
-    ushr v19.8h, v7.8h, #9
-    ushr v21.8h, v7.8h, #10
-    ushr v23.8h, v7.8h, #11
-
-    and v16.16b, v16.16b, v0.16b
-    and v18.16b, v18.16b, v0.16b
-    and v20.16b, v20.16b, v0.16b
-    and v22.16b, v22.16b, v0.16b
-    and v17.16b, v17.16b, v0.16b
-    and v19.16b, v19.16b, v0.16b
-    and v21.16b, v21.16b, v0.16b
-    and v23.16b, v23.16b, v0.16b
-
-    add  v8.8h,  v8.8h, v16.8h
-    add v10.8h, v10.8h, v18.8h
-    add v12.8h, v12.8h, v20.8h
-    add v14.8h, v14.8h, v22.8h
-    add  v9.8h,  v9.8h, v17.8h
-    add v11.8h, v11.8h, v19.8h    
-    add v13.8h, v13.8h, v21.8h    
-    add v15.8h, v15.8h, v23.8h
-
-    orr  v24.16b,  v8.16b, v10.16b
-    orr  v25.16b, v12.16b, v14.16b
-    orr  v26.16b,  v9.16b, v11.16b
-    orr  v27.16b, v13.16b, v15.16b
-    orr  v28.16b, v24.16b, v25.16b
-    orr  v29.16b, v26.16b, v27.16b
-    orr  v30.16b, v28.16b, v29.16b
-    orr   v1.16b,  v1.16b, v30.16b
-
-    shl  v8.8h,  v8.8h, #8
-    shl v10.8h, v10.8h, #9
-    shl v12.8h, v12.8h, #10
-    shl v14.8h, v14.8h, #11
-    shl  v9.8h,  v9.8h, #8
-    shl v11.8h, v11.8h, #9
-    shl v13.8h, v13.8h, #10
-    shl v15.8h, v15.8h, #11
-
-    eor v2.16b, v2.16b, v8.16b
-    eor v2.16b, v2.16b, v10.16b
-    eor v2.16b, v2.16b, v12.16b
-    eor v2.16b, v2.16b, v14.16b
-    eor v3.16b, v3.16b, v9.16b
-    eor v3.16b, v3.16b, v11.16b
-    eor v3.16b, v3.16b, v13.16b
-    eor v3.16b, v3.16b, v15.16b
-
-    #load
-    ld1 {v8.8h - v11.8h},  [src1], #64
-    ld1 {v12.8h - v15.8h}, [src1], #64
-
-    ushr v16.8h, v6.8h, #12
-    ushr v18.8h, v6.8h, #13
-    ushr v20.8h, v6.8h, #14
-    ushr v22.8h, v6.8h, #15
-    ushr v17.8h, v7.8h, #12
-    ushr v19.8h, v7.8h, #13
-    ushr v21.8h, v7.8h, #14
-    ushr v23.8h, v7.8h, #15
-
-    and v16.16b, v16.16b, v0.16b
-    and v18.16b, v18.16b, v0.16b
-    and v20.16b, v20.16b, v0.16b
-    and v22.16b, v22.16b, v0.16b
-    and v17.16b, v17.16b, v0.16b
-    and v19.16b, v19.16b, v0.16b
-    and v21.16b, v21.16b, v0.16b
-    and v23.16b, v23.16b, v0.16b
-
-    add  v8.8h,  v8.8h, v16.8h
-    add v10.8h, v10.8h, v18.8h
-    add v12.8h, v12.8h, v20.8h
-    add v14.8h, v14.8h, v22.8h
-    add  v9.8h,  v9.8h, v17.8h
-    add v11.8h, v11.8h, v19.8h    
-    add v13.8h, v13.8h, v21.8h    
-    add v15.8h, v15.8h, v23.8h
-
-    orr  v24.16b,  v8.16b, v10.16b
-    orr  v25.16b, v12.16b, v14.16b
-    orr  v26.16b,  v9.16b, v11.16b
-    orr  v27.16b, v13.16b, v15.16b
-    orr  v28.16b, v24.16b, v25.16b
-    orr  v29.16b, v26.16b, v27.16b
-    orr  v30.16b, v28.16b, v29.16b
-    orr   v1.16b,  v1.16b, v30.16b
-
-    shl  v8.8h,  v8.8h, #12
-    shl v10.8h, v10.8h, #13
-    shl v12.8h, v12.8h, #14
-    shl v14.8h, v14.8h, #15
-    shl  v9.8h,  v9.8h, #12
-    shl v11.8h, v11.8h, #13
-    shl v13.8h, v13.8h, #14
-    shl v15.8h, v15.8h, #15
-
-    eor v2.16b, v2.16b, v8.16b
-    eor v2.16b, v2.16b, v10.16b
-    eor v2.16b, v2.16b, v12.16b
-    eor v2.16b, v2.16b, v14.16b
-    eor v3.16b, v3.16b, v9.16b
-    eor v3.16b, v3.16b, v11.16b
-    eor v3.16b, v3.16b, v13.16b
-    eor v3.16b, v3.16b, v15.16b
-
-    eor v2.16b, v2.16b, v4.16b
-    eor v3.16b, v3.16b, v5.16b
+    eor v20.16b, v19.16b, v5.16b
 
     #store
-    str q2, [dst, #0]
-    str q3, [dst, #16]
+    str q20, [dst], #16
 
-    add dst, dst, #32
-    add src2, src2, #32
-    subs counter, counter, #512
+    subs counter, counter, #256
     b.ne _loop_sotp_inv
 
-    ushr v1.8h, v1.8h, #1
-    umaxv h1, v1.8h
-    umov  w0, v1.h[0]
+    eor v3.16b, v3.16b, v2.16b
+    and v3.16b, v3.16b, v0.16b
+    
+    umaxv h3, v3.8h
+    umov  w0, v3.h[0]
     cmp w0, #0
     cset x0, ne
 
@@ -546,4 +422,3 @@ _loop_sotp_inv:
     .unreq    counter
 
     ret
-*/
