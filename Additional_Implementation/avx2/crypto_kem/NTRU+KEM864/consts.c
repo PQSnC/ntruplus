@@ -347,6 +347,11 @@ const uint16_t _16xR2[16] __attribute__((aligned(32))) = {R2, R2, R2, R2, R2, R2
 const uint16_t _16xR2qinv[16] __attribute__((aligned(32))) = {R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv, R2qinv};
 const uint16_t _16xRinv[16] __attribute__((aligned(32))) = {Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv, Rinv};
 const uint16_t _16xRinvqinv[16] __attribute__((aligned(32))) = {Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv, Rinvqinv};
+
+const uint16_t _16x5555[16] __attribute__((aligned(32))) = {0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555, 0x5555};
+const uint16_t _16x0303[16] __attribute__((aligned(32))) = {0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303, 0x0303};
+const uint16_t _16x0101[16] __attribute__((aligned(32))) = {0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101, 0x0101};
+
 #undef QINV
 #undef LOW
 #undef V

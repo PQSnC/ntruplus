@@ -13,6 +13,7 @@
 *              - const uint8_t *buf: pointer to input random
 *                                     (of length NTRUPLUS_N/4 bytes)
 **************************************************/
+/*
 void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 {
     const __m256i mask55 = _mm256_set1_epi32(0x55555555);
@@ -156,7 +157,7 @@ void poly_cbd1(poly *r, const unsigned char buf[NTRUPLUS_N/4])
 		}
 	}
 }
-
+*/
 /*************************************************
 * Name:        poly_sotp
 *
